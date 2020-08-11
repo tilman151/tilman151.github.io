@@ -577,18 +577,18 @@ Instead, the concrete class uses shared functionality provided by the abstract c
 This pattern is called a **MixIn**.
 
 ```python
-class ModelTestsMixin:
+class AbstractTestVAE:
     ...
 
-class TestCNNVAE(unittest.TestCase, ModelTestsMixin):
+class TestCNNVAE(unittest.TestCase, AbstractTestVAE):
     ...
 
-class TestMLPVAE(unittest.TestCase, ModelTestsMixin):
+class TestMLPVAE(unittest.TestCase, AbstractTestVAE):
     ...
 ```
 
 The order of the parent classes is important, as the method lookup is done from left to right.
-This means that `TestCase` would override shared methods of `ModelTestsMixin`.
+This means that `TestCase` would override shared methods of `AbstractTestVAE`.
 In our case, this is not a problem, but good to know anyway.
 
 ## Trainer
