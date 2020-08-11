@@ -6,9 +6,10 @@ categories: cleancode
 
 Deep learning is a discipline where the correctness of code is hard to assess.
 Random initialization, huge datasets and limited interpretability of weights mean that finding the exact issue of why your model is not training, is trial-and-error most times.
-In classical software development, automated unit tests are the bread and butter for determining if your code does what it is supposed to.
+In classical software development, automated unit tests are the bread and butter for determining if your code does what it is supposed to do.
 It helps the developer to trust their code and be confident when introducing changes.
 A breaking change would be detected by the unit tests.
+
 If one can go by the state of many research repositories on GitHub, practitioners of deep learning are not yet fond of this method.
 Are practitioners okay with not knowing if their code works correctly?
 Often, the problem is that the expected behavior of each component of a learning system is not easily defined because of the three reasons above.
