@@ -557,7 +557,7 @@ We can use the full power of the programming language while staying true to our 
 
 Yes, you can!
 Even though it took so few lines of code that it does not really warrant calling it a library, you can find it [here](https://www.github.com/tilman151/klay).
-Currently, the library supports all operations to recreate the DL4J examples.
+Currently, the library supports all operations to recreate the quickstart examples of DL4J.
 If you are missing something and want to help out, feel free to send me a pull request.
 
 If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out my question on StackOverflow related to this article
