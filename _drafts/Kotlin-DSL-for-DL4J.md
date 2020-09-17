@@ -523,6 +523,7 @@ This makes the code much uglier than before.
 Let's see the *Klay* declaration on the other hand:
 
 ```kotlin
+val units = listOf(100, 200, 300, 400)
 val config = sequential {
              activation(Activation.RELU)
              updater(Nesterovs(rate, 0.98))
@@ -531,10 +532,10 @@ val config = sequential {
                      nIn(numRows * numColumns)
                      nOut(units[0])
                  }
-                 for (i in 1 until units.size) {
+                 for (u in units.zipWithNext()) {
                      dense {
-                         nIn(units[i-1])
-                         nOut(units[i])
+                         nIn(u.first)
+                         nOut(u.second)
                      }
                  }
                  output {
