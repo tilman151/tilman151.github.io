@@ -492,7 +492,7 @@ A common example would be to add several dense layers with an increasing number 
 In standard DL4J it would look like this:
 
 ```kotlin
-val units = listOf(200, 200, 300, 400)
+val units = listOf(100, 200, 300, 400)
 
 val unfinished = NeuralNetConfiguration.Builder()
     .activation(Activation.RELU)
@@ -503,10 +503,10 @@ val unfinished = NeuralNetConfiguration.Builder()
              .nOut(units[0])
              .build())
 
-for (i in 1 until units.size) {
+for (u in units.zipWithNext()) {
     unfinished.layer(DenseLayer.Builder()
-        .nIn(units[i-1])
-        .nOut(units[i])
+        .nIn(u.first)
+        .nOut(u.second)
         .build())
 }
 
