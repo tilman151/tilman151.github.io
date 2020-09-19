@@ -548,16 +548,18 @@ val config = sequential {
          }
 ```
 
-The loop integrates nicely with the rest of the declaration and we do not break the flow.
+The loop integrates nicely with the rest of the declaration, and we do not break the flow.
 The point is, this is not some gimmick I added in the background.
 This is out of the box functionality in Kotlin.
 We can use the full power of the programming language while staying true to our DSL.
 
-### Can I use *Klay*, too?
+### Is *Klay* ready to use?
 
-Yes, you can!
+Yes, it is!
 Even though it took so few lines of code that it does not really warrant calling it a library, you can find it [here](https://www.github.com/tilman151/klay).
-Currently, the library supports all operations to recreate the quickstart examples of DL4J.
+All code is provided as is, yada, yada, yada.
+
+Currently, the library supports all operations needed to recreate the quickstart examples of DL4J.
 If you are missing something and want to help out, feel free to send me a pull request.
 
 If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out my question on StackOverflow related to this article
