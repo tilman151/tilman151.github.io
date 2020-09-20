@@ -8,8 +8,8 @@ A while ago, I stumbled upon an [article](https://blog.jetbrains.com/kotlin/2019
 I found it interesting, as some of Python's quirks were starting to bother me and I wanted to try something new.
 A day later, I had completed the Kotlin tutorials using [Kotlin Koans](https://www.jetbrains.com/help/education/learner-start-guide.html?section=Kotlin%20Koans&_ga=2.101592385.1724296010.1598524435-160366776.1590830721) in IntelliJ IDEA (which is an excellent way to get started with Kotlin).
 Hungry to test out my new language skills, I looked around for a project idea.
-As I am a deep learning engineer, naturally I had a look at what DL frameworks Kotlin has to offer and arrived at DL4J.
-This is a Java framework, but as Kotlin is interoperable with Java, it can be used anyway.
+As I am a deep learning engineer, naturally I had a look at what DL frameworks Kotlin had to offer and arrived at DL4J.
+This is actually a Java framework, but as Kotlin is interoperable with Java, it can be used anyway.
 I had a look at some examples of how to build a network and found this ([Source](https://github.com/eclipse/deeplearning4j-examples/blob/master/dl4j-examples/src/main/kotlin/org/deeplearning4j/quickstartexamples/feedforward/mnist/MLPMnistTwoLayerExample.kt)):
 
 ```kotlin
@@ -41,8 +41,9 @@ val model = MultiLayerNetwork(conf)
 model.init()
 ```
 
-Coming from Python and PyTorch, I just thought: "Damn, that's garbage!".
-Maybe that's just my bias because I think Java code is ugly as hell, but Kotlin promised to reduce the verbosity that makes Java so hard to read, so I did not expect this.
+Coming from Python and PyTorch, I just thought: "Damn, that's not pretty!".
+Maybe it's just my bias because I think Java code is ugly as hell.
+On the other hand, Kotlin promised to reduce the verbosity that makes Java so hard to read, so maybe I could do something about this.
 At this point, my project began to take form.
 What if I could use the nice Kotlin techniques from the tutorial to make network declarations in DL4J more readable.
 I arrived at this:
@@ -166,6 +167,7 @@ DSL is quite a buzzword (memorize it if you want to impress your superiors), so 
 Using this definition, DL4J, in a way, already has a DSL for defining network structures, albeit an ugly one.
 Thus, we only need to wrap the existing language into a readable one.
 Because Kotlin is a JVM language and interoperable with Java, I will use Java instead of Python as a reference point in the following paragraphs.
+So here comes all my Java skill from the first semester.
 
 *Skip this part if you know everything about higher-order functions, Lambda expressions, and extension functions.*
 
@@ -270,7 +272,7 @@ data class Person(val name: String)
 val persons = listOf(Person("Foo"), Person("Bar"))
 
 val getName: Person.() -> String = {this.name}
-val name = persons.map(getName)
+val names = persons.map(getName)
 ```
 
 We first assigned the Lambda to a variable to declare the function type.
@@ -292,11 +294,15 @@ p.apply {
 ```
 
 The return type of the Lambda, that is passed to `apply`, is `Unit` which means it returns nothing (similar to Java's `void`).
-Alternatively, we could use the `run` function, which assumes that the Lambda returns a result:
+The function `apply` simply returns the receiver object.
+Alternatively, we could use the `run` function, which returns the result of the last call in the Lambda:
 
 ```kotlin
 val p = Person("Foo")
-print(p.run {age = 25})
+print(p.run {
+    age = 25
+    age
+ })
 ```
 
 With all that theory in our mind, let us see how all this leads to our neural network DSL.
@@ -369,7 +375,7 @@ val conf = sequential( {
 } )
 ```
 
-Inside the `init` Lambda, we have access to all member functions of the `Builder` to configure defaults.
+Inside the `init` Lambda, we have access to all member functions of the `Builder` via `this` to configure defaults.
 Calling the `list` function, we can add layers the conventional way.
 `list` and each call of `layer` return a `NeuralNetConfiguration.ListBuilder` object.
 As `layer` is the last function call in the Lambda expression, its resulting `Builder` is returned to `sequential` to be built there.
@@ -414,7 +420,7 @@ val conf = sequential( {
 `apply` returns the `ListBuilder` created by `list`.
 Therefore, our function can be used as a drop-in replacement.
 
-The last offending code is the call of the `layer` function for adding a single layer to the network.
+The last offending code is the call of the `layer` function for adding each layer to the network.
 We can simply outsource the call, and the creation of the layer's `Builder` to an extension function of the `ListBuilder`.
 For the `DenseLayer` and `OutputLayer`, the functions looks like this:
 
@@ -429,7 +435,7 @@ fun NeuralNetConfiguration.ListBuilder.output(init: OutputLayer.Builder.() -> Un
 ```
 
 The Lambda expression with the layer's `Builder` as the receiver lets us again conveniently configure the layer.
-Our example has is now completely transformed:
+Our example has now completely transformed:
 
 ```kotlin
 val conf = sequential( {
@@ -458,8 +464,7 @@ val conf = sequential( {
 ```
     
 But wait, this isn't even its final form.
-Now we have to apply all of Kotlin's syntactic sugar, i.e. removing `this` and the parenthesis.
-Et voila:
+Now we have to apply all of Kotlin's syntactic sugar, i.e. removing `this` and the parenthesis, et voila:
 
 ```kotlin
 val conf = sequential {
@@ -486,6 +491,10 @@ val conf = sequential {
     }
 }
 ```
+
+We are done.
+All this with only four new functions.
+Extending our little library for new layers now only takes one function each.
 
 Another point where *Klay* shines is procedurally generating network layer declarations.
 A common example would be to add several dense layers with an increasing number of units to our network with a loop.
@@ -553,7 +562,7 @@ The point is, this is not some gimmick I added in the background.
 This is out of the box functionality in Kotlin.
 We can use the full power of the programming language while staying true to our DSL.
 
-### Is *Klay* ready to use?
+## Is *Klay* ready to use?
 
 Yes, it is!
 Even though it took so few lines of code that it does not really warrant calling it a library, you can find it [here](https://www.github.com/tilman151/klay).
@@ -564,11 +573,11 @@ They are included in the project repository.
 Converting them from Java to Kotlin was, fortunately, extremely easy thanks to IntelliJ IDEA's automatic conversion function.
 If you are missing something and want to help out, feel free to send me a pull request.
 
-### Conclusion
+## Conclusion
 
 I liked working with Kotlin for a change and maybe I will expand *Klay*'s coverage of DL4J later on.
 On the other hand, I noticed that I am not as fluent in Kotlin as in Python which let me struggle a bit with this project.
 
-If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out my question on StackOverflow related to this article
+If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out [my question on StackOverflow](https://stackoverflow.com/questions/63613459/generic-function-for-dl4j-in-kotlin) related to this article.
 I was not able to make the layer building functions generic and would appreciate some input.
 You would really help me out there.
