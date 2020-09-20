@@ -420,6 +420,8 @@ def make_deterministic(seed=42):
     random.seed(seed)
 ```
 
+*Update: To truly fix all randomness, you have to set the [PYTHONHASHSEED](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHASHSEED), too. This affects the hashing in dictionaries and sets. Thanks to /u/bpooqd on Reddit for the feedback.* 
+
 ### The sample independence of your model
 
 In 99.99% of cases, you want to train your model with stochastic gradient descent in one form or another.
