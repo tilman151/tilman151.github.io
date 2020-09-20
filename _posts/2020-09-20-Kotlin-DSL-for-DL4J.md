@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Make DL4J Readable Again"
-categories: kotlin
+categories: cleancode
 ---
     
 A while ago, I stumbled upon an [article](https://blog.jetbrains.com/kotlin/2019/12/making-kotlin-ready-for-data-science/) about the language Kotlin and how to use it for Data Science.
