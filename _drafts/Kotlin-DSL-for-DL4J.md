@@ -6,7 +6,7 @@ categories: kotlin
     
 A while ago, I stumbled upon an [article](https://blog.jetbrains.com/kotlin/2019/12/making-kotlin-ready-for-data-science/) about the language Kotlin and how to use it for Data Science.
 I found it interesting, as some of Python's quirks were starting to bother me and I wanted to try something new.
-A day later, I had completed the Kotlin tutorials using [Kotlin Koans](https://www.jetbrains.com/help/education/learner-start-guide.html?section=Kotlin%20Koans&_ga=2.101592385.1724296010.1598524435-160366776.1590830721) in IntelliJIdea (which is an excellent way to get started with Kotlin).
+A day later, I had completed the Kotlin tutorials using [Kotlin Koans](https://www.jetbrains.com/help/education/learner-start-guide.html?section=Kotlin%20Koans&_ga=2.101592385.1724296010.1598524435-160366776.1590830721) in IntelliJ IDEA (which is an excellent way to get started with Kotlin).
 Hungry to test out my new language skills, I looked around for a project idea.
 As I am a deep learning engineer, naturally I had a look at what DL frameworks Kotlin has to offer and arrived at DL4J.
 This is a Java framework, but as Kotlin is interoperable with Java, it can be used anyway.
@@ -557,10 +557,17 @@ We can use the full power of the programming language while staying true to our 
 
 Yes, it is!
 Even though it took so few lines of code that it does not really warrant calling it a library, you can find it [here](https://www.github.com/tilman151/klay).
-All code is provided as is, yada, yada, yada.
+All code is provided as-is, yadda, yadda, yadda.
 
 Currently, the library supports all operations needed to recreate the quickstart examples of DL4J.
+They are included in the project repository.
+Converting them from Java to Kotlin was, fortunately, extremely easy thanks to IntelliJ IDEA's automatic conversion function.
 If you are missing something and want to help out, feel free to send me a pull request.
+
+### Conclusion
+
+I liked working with Kotlin for a change and maybe I will expand *Klay*'s coverage of DL4J later on.
+On the other hand, I noticed that I am not as fluent in Kotlin as in Python which let me struggle a bit with this project.
 
 If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out my question on StackOverflow related to this article
 I was not able to make the layer building functions generic and would appreciate some input.
