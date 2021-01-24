@@ -11,24 +11,24 @@ While the first two statements are certainly appropriate reactions - and the thi
 
 There are indeed articles comparing some autoencoders to each other (e.g. [[1]](https://medium.com/@venkatakrishna.jonnalagadda/sparse-stacked-and-variational-autoencoder-efe5bfe73b64), [[2]](https://towardsdatascience.com/a-high-level-guide-to-autoencoders-b103ccd45924), [[3]](https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73)), I found them lacking something.
 Most only compare a hand full of types and/or only scratch the surface of what autoencoders can do.
-Often you see only reconstructed samples, generated samples or latent space visualization but nothing about downstream tasks.
+Often you see only reconstructed samples, generated samples, or latent space visualization but nothing about downstream tasks.
 I wanted to know if a stacked autoencoder is better than a sparse one for anomaly detection or if a variational autoencoder learns better features for classification than a vector-quantized one.
 Inspired by this [repository](https://github.com/AntixK/PyTorch-VAE) I found, I took it into my own hands, and thus this blog post came into existence.
 
-Of course this article will probably not be a complete list of all the autoencoders out there, there are just too many.
+Of course, this article will probably not be a complete list of all the autoencoders out there, there are just too many.
 But, if you are missing your favorite autoencoder, feel free to contact me or send a PR.
 I tried to structure the code to be easily extendable, and you can find it at [github.com/tilman151/ae_bakeoff](https://github.com/tilman151/ae_bakeoff).
 
 This is my first personal project with *pytorch-lightning*, too.
-It really helped to make my code more structured, readable and cut out tons of boiler plate code.
+It really helped to make my code more structured, readable and cut out tons of boilerplate code.
 You can check out this great package [here](https://github.com/PyTorchLightning/pytorch-lightning).
 
 ## What and how are we comparing?
 
 First, let's make clear what the inclusion criterion for this article is.
 We are interested in all modifications to a vanilla deep autoencoder that change the way the latent space behaves or may improve a downstream task.
-This excludes application specific losses (e.g. perceptual VGG19 loss for images) and the types of encoder and decoder (e.g. LSTM vs. CNN).
-Following types have made the cut:
+This excludes application-specific losses (e.g. perceptual VGG19 loss for images) and the types of encoder and decoder (e.g. LSTM vs. CNN).
+The following types have made the cut:
 
 - Shallow Autoencoders
 - Deep Autoencoders (vanilla AE)
@@ -48,7 +48,7 @@ Aside from describing what makes each of them unique, we will compare them in th
 - ROC curve for anomaly detection with the reconstruction error
 - Classification accuracy of a linear layer fitted on the autoencoder's features
 
-All autoencoders tested share the same simple architecture with a fully-connected en- and decoder, batch normalization and ReLU activation functions.
+All autoencoders tested share the same simple architecture with a fully-connected en- and decoder, batch normalization, and ReLU activation functions.
 The output layer features a sigmoid activation function.
 Save for the shallow one, all autoencoders have three encoder and decoder layers each.
 
@@ -62,15 +62,15 @@ The MNIST dataset will serve as the venue for our contest.
 The default train/test split is further divided into a train/val/test split by taking a random sample of 5000 samples from the training split for validation.
 
 Obviously, there are some limitations to what we are doing here.
-All trainings are only done once, so we have no measure on how stable the performances are.
-We are only using one dataset, so drawing any generalized conclusions is off limits.
+All training runs are only done once, so we have no measure of how stable the performances are.
+We are only using one dataset, so drawing any generalized conclusions is off-limits.
 Nevertheless, this is a blog and not a journal, so I think we are fine.
 With all that in mind, let's begin our *Great Autoencoder Bake Off*.
 
 ## The Contestants
 
-First we will have a look at how each tested autoencoder works and what makes them special.
-From that we will try to form a few hypotheses on how they will perform on the tasks.
+First, we will have a look at how each tested autoencoder works and what makes them special.
+From that, we will try to form a few hypotheses on how they will perform on the tasks.
 
 ### Shallow Autoencoder
 
@@ -86,8 +86,8 @@ A shallow autoencoder features only one layer in its encoder and decoder each.
 To distinguish the shallow autoencoder from a PCA, it uses a ReLU activation function in the encoder and a sigmoid in the decoder.
 It is therefore non-linear.
 
-Normally, the default choice for the reconstruction loss an autoencoder is trained against, is mean squared error.
-We will use binary cross entropy (BCE) because it yielded better looking images in the preliminary experiments.
+Normally, the default choice for the reconstruction loss for an autoencoder is mean squared error.
+We will use binary cross-entropy (BCE) because it yielded better-looking images in the preliminary experiments.
 If you want to know why this is a valid choice of a loss function, I recommend reading chapters 5.5 and 6.2.1 of the [Deep Learning Book](https://www.deeplearningbook.org/).
 As all following autoencoders, the shallow one is trained against the following version of BCE:
 
@@ -109,7 +109,7 @@ The deep autoencoder has no restrictions on its latent space and should, as a co
 
 The stacked autoencoder is a "hack" to get a deep autoencoder by training only shallow ones.
 Instead of training the autoencoder end-to-end, we train it in a layer-wise, greedy fashion.
-First we take the first encoder and last decoder layer to form a shallow autoencoder.
+First, we take the first encoder and last decoder layer to form a shallow autoencoder.
 After training these layers, we encode the whole dataset with the encoding layer and form another shallow autoencoder from the second encoder and next-to-last decoder layer.
 This second shallow autoencoder is trained with the encoded dataset.
 This process is repeated until we arrive at the innermost layers.
@@ -122,7 +122,7 @@ Again, we have no restrictions on the latent space, but the encoding is expected
 
 The sparse autoencoder imposes a sparsity constraint on the latent code.
 Each element in the latent code should only be active with a probability $$p$$.
-We add following auxiliary loss to enforce it while training:
+We add the following auxiliary loss to enforce it while training:
 
 $$L_s(z) = \sum_{i=1}^N \left( p \cdot \log{\frac{p}{\bar{z}^{(i)}}} + (1 - p) \cdot \log{\frac{1 - p}{1 - \bar{z}^{(i)}}} \right)$$
 
@@ -141,7 +141,7 @@ $$L = L_r + \beta L_s$$
 
 ### Denoising Autoencoder
 
-The denoising autoencoder does not restrict the latent space, but aims to learn a more efficient encoding through applying noise to the input data.
+The denoising autoencoder does not restrict the latent space but aims to learn a more efficient encoding through applying noise to the input data.
 Instead of feeding the input data straight to the network, we add Gaussian noise as follows:
 
 $$x' = \operatorname{clip} (x + \mathcal{N}(0;\operatorname{diag}(\mathbf{I}))) $$
@@ -178,7 +178,7 @@ $$\operatorname{reparametrize}(\mu, \Sigma) = \Sigma \cdot \operatorname{sample}
 
 This formulation has a gradient with respect to $$\mu$$ and $$\Sigma$$ and makes training with backpropagation possible.
 
-The variational autencoder further restricts the latent space by requiring Gaussian distributions to be similar to a standard Gaussian.
+The variational autoencoder further restricts the latent space by requiring Gaussian distributions to be similar to a standard Gaussian.
 The distribution parameters are therefore penalized with the Kulback-Leibler divergence:
 
 $$L_{KL} = \frac{1}{2N}\sum_{i=1}^N \sum_{j=1}^{|z|} (2\Sigma_j^{(i)} + (\mu_j^{(i)})^2 - 1 - 2\log{(\Sigma_j^{(i)})})$$
@@ -206,14 +206,14 @@ $$L = L_r + \beta L_{KL}$$
 
 A $$\beta < 1$$ relaxes the constraints on the latent space while a $$\beta > 1$$ makes the constraint stricter.
 The former should result in better reconstructions and the latter in better unconditional sampling.
-The theoretic derivation makes good arguments what else this simple change affects.
+The theoretic derivation makes good arguments about what else this simple change affects.
 You can read them on [OpenReview](https://openreview.net/pdf?id=Sy2fzU9gl).
 We will use a strict version of this autoencoder with $$\beta = 2$$ and a loose version with $$\beta = 0.5$$.
 
 ### Vector-Quantized Variational Autoencoder
 
-The vector-quantized variational autoencoder (vq-VAE) is a VAE that uses a uniform categorial distribution to generate its latent codes.
-Each element of the encoder output is replaced by the categorial value of the distribution that is its nearest neighbor.
+The vector-quantized variational autoencoder (vq-VAE) is a VAE that uses a uniform categorical distribution to generate its latent codes.
+Each element of the encoder output is replaced by the categorical value of the distribution that is its nearest neighbor.
 This is a form of *quantization* and means that the latent space is not continuous anymore but discrete.
 
 $$\hat{x} = \operatorname{dec}(\operatorname{quantize}(\operatorname{enc}(x))))$$
@@ -228,13 +228,13 @@ On the other hand, the encoder is encouraged to output encodings similar to the 
 $$L_{c} = \frac{1}{N}\sum_{i=1}^N \sum_{j=1}^{|z|} (z_j^{(i)} - \operatorname{sg}(\hat{z}_j^{(i)}))^2$$ 
 
 This is called the commitment loss.
-A Kulback-Leibler divergence loss is not necessary, as the divergence would be a constant for a uniform categorial distribution.
+A Kulback-Leibler divergence loss is not necessary, as the divergence would be a constant for a uniform categorical distribution.
 Both losses are combined with the reconstruction loss by a hyperparameter $$\beta$$ controlling the influence of the commitment loss:
 
 $$L = L_r + L_{vq} + \beta L_c$$
 
 Because the vq-VAE is a generative model, we can sample from it unconditionally, too.
-In the original paper a pixel-CNN is used to autoregressively sample a latent code.
+In the original paper, a pixel-CNN is used to autoregressively sample a latent code.
 For simplicity's sake, we will sample by drawing categories uniformly.
 
 ## The Gauntlet
@@ -265,7 +265,7 @@ The vq-VAE produces slightly less blurry reconstructions, which the original aut
 
 Otherwise, there is little difference to be seen between the different autoencoders.
 This is supported by the reconstruction errors over the whole test set.
-The table below lists the summed binary cross entropy averaged over the samples of the set.
+The table below lists the summed binary cross-entropy averaged over the samples of the set.
 
 |shallow|vanilla|stacked|sparse|denoising|
 |:-----:|:-----:|:-----:|:----:|:-------:|
@@ -277,10 +277,10 @@ The table below lists the summed binary cross entropy averaged over the samples 
 
 Trailing far behind, as suspected, is the shallow autoencoder.
 It simply lacks the capacity to capture the structure of MNIST.
-The vanilla autoencoder fares comparatively well, securing the 1st place together with the sparse autoencoder and the vq-VAE.
+The vanilla autoencoder fares comparatively well, securing 1st place together with the sparse autoencoder and the vq-VAE.
 Both of the latter do not seem to suffer from their latent space restrictions in this regard.
 The VAE and beta-VAEs, on the other hand, do achieve a higher error, due to their restrictions.
-In addition, the sampling process in the VAEs introduces noise that harms the reconstruction error.
+Besides, the sampling process in the VAEs introduces noise that harms the reconstruction error.
 
 We will see later if reconstruction ability is a good proxy of performance on the other tasks.
 
@@ -288,7 +288,7 @@ We will see later if reconstruction ability is a good proxy of performance on th
 
 The next trial will be a bit shorter, as only four contestants can sample unconditionally from their latent space: VAE, loose and strict beta-VAE, as well as vq-VAE.
 For each of them, we sample 16 latent codes and decode them.
-For the VAE and beta-VAEs we sample from a standard Gaussian.
+For the VAE and beta-VAEs, we sample from a standard Gaussian.
 The latent codes for the vq-VAE will be sampled uniformly from their learned categories.
 
 | vae  |beta_vae_strict|
@@ -299,10 +299,10 @@ The latent codes for the vq-VAE will be sampled uniformly from their learned cat
 |:------------:|:----:|
 |<img alt="Loose beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/samples/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/samples/vq.jpeg" style="max-width:unset;"/>|
 
-None of them look pretty, but we can glance some differences, nonetheless.
+None of them look pretty, but we can glance at some differences, nonetheless.
 The most meaningful samples were generated by the strict beta-VAE.
-This was expected, because its training laid the highest emphasis on enforcing the Gaussian prior.
-It's encoder output is therefore most similar to samples from a standard Gaussian which enables the decoder to successfully decode latent codes sampled from a true standard Gaussian.
+This was expected because its training laid the highest emphasis on enforcing the Gaussian prior.
+Its encoder output is therefore most similar to samples from a standard Gaussian which enables the decoder to successfully decode latent codes sampled from a true standard Gaussian.
 
 The variance of images on the other hand is relatively small.
 We can see many fiveish, sixish-looking digits on the right, for example.
@@ -311,7 +311,7 @@ This makes sense, as the loose beta-VAE laid less emphasis on the prior and coul
 Then again, it's encoder outputs are less similar to standard Gaussian samples, which is why it fails to assign the unconditioned samples any meaning most of the time.
 The standard VAE lays somewhere between the other two, which is no surprise here.
 
-A bit of a disappointment are the sampled images from the vq-VAE.
+A bit of a disappointment is the sampled images from the vq-VAE.
 They do not resemble MNIST digits at all.
 The vq-VAE does not seem to support easy sampling by uniformly drawing categories and a more complex, learned prior seems, indeed, necessary.
 
@@ -324,7 +324,7 @@ If the images from the interpolated latent codes show meaningful digits, the lat
 
 For all VAE types, we interpolate before the bottleneck operation.
 This means that we interpolate the Gaussian parameters and then sample from them for the VAE and beta-VAE.
-For the vq-VAE we first interpolate and then quantize.
+For the vq-VAE, we first interpolate and then quantize.
 
 |shallow|vanilla|stacked|
 |:-----:|:-----:|:-----:|
@@ -362,13 +362,13 @@ The scales of the x- and y-axis don't have any specific meaning.
 ![Latent Space Visualization in 2D](https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reduction.png)
 
 There are some obvious similarities between the plots.
-First of all, we can see that the plots of vanilla, stacked, sparse, denoising and vq-VAE are quite similar if we ignore different rotations.
-The clusters of zeros (blue), ones (orange), twos (green) and sixes (pink) are always nicely separated, so they seem to be quite different from the other digits.
+First of all, we can see that the plots of vanilla, stacked, sparse, denoising, and vq-VAE are quite similar if we ignore different rotations.
+The clusters of zeros (blue), ones (orange), twos (green), and sixes (pink) are always nicely separated, so they seem to be quite different from the other digits.
 Then, we have a cluster of 4-7-9 (purple-gray-turquoise) and a cluster of 3-5-8 (red-brown-yellow).
 This hints at a connection between these digits, e.g swap the upper vertical line of a three and you get a five, add two more vertical lines and you get an eight.
 The autoencoders seem to encode the structural similarities between the digits.
 
-The shallow autoencoder seems to struggle separating the digits into clusters.
+The shallow autoencoder seems to struggle to separate the digits into clusters.
 While the cluster of ones is nicely separated, the other digits' clusters are overlapping.
 This means that the shallow autoencoder maps some instances of different digits to the same latent code, leading to weird results we have seen in the reconstructions.
 
@@ -409,7 +409,7 @@ Unsurprisingly, nearly all autoencoders improved on the baseline, with the spars
 The denoising autoencoder takes the first place, closely followed by the vanilla autoencoder and vq-VAE.
 It seems that the added input noise of the denoising autoencoder produces features that generalize best for classification.
 
-The most interesting is in my opinion, that even the shallow autoencoder slightly improves the accuracy, even though it has only one layer and much less parameters.
+The most interesting is in my opinion, that even the shallow autoencoder slightly improves the accuracy, even though it has only one layer and much fewer parameters.
 This shows once again that intelligent data usage often beats bigger models.
 
 The VAE and beta-VAE show again how the divergence loss restricts the latent space.
@@ -427,7 +427,7 @@ We would need to test the sparse autoencoder on other datasets to see if it work
 In anomaly detection, or novelty detection to be specific, we want to find outlier samples in our test data, given our training data has no such outliers.
 Common applications are network intrusion detection or fault detection in predictive maintenance.
 We will fabricate an anomaly detection task from MNIST by excluding all images of ones from the training data.
-Afterwards we will see if the trained model can separate the ones in the test set from the other digits.
+Afterward, we will see if the trained model can separate the ones in the test set from the other digits.
 
 Doing anomaly detection with autoencoders is relatively straight-forward.
 We take the trained model and calculate the reconstruction loss for our test samples.
@@ -461,7 +461,7 @@ If our latent space generalizes too well, we are hurting our anomaly detection p
 The ability of an autoencoder to generalize is dependent on its encoder and decoder capacity, as well as the dimensionality of the latent space.
 We already lowered the dimensionality of the latent space to two for the anomaly detection, so there is not much room to go lower.
 Through its limited capacity, the shallow autoencoder struck the right balance of how well it modeled the training data.
-The stacked autoencoder's greedy layer-wise training is limiting its ability to generalize in a similar way.
+The stacked autoencoder's greedy layer-wise training is limiting its ability to generalize similarly.
 
 In the end, we may have to conclude that MNIST is just too damn easy.
 The deep autoencoders have much more capacity than it is helpful for this dataset.
@@ -487,7 +487,7 @@ If you are doing anomaly detection, maybe try a shallow one first or even PCA.
 Sometimes less is better.
 
 As I said in the beginning, this article cannot draw any conclusions beyond MNIST, but it serves as a good pointer, nevertheless.
-It would be interesting to do another run with a more complex dataset or one where the sparse autoencoder had it's time to shine.
-A more focused look on what goes on in anomaly detection would be a nice thing, too.
+It would be interesting to do another run with a more complex dataset or one where the sparse autoencoder had its time to shine.
+A more focused look at what goes on in anomaly detection would be a nice thing, too.
 
 As always, more questions generated than answered.
