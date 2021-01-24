@@ -115,6 +115,8 @@ This second shallow autoencoder is trained with the encoded dataset.
 This process is repeated until we arrive at the innermost layers.
 In the end, we get a deep autoencoder out of *stacked* shallow autoencoders.
 
+We will train each of the $$n$$ layers for $$\frac{1}{n}th$$ of the total training epochs.
+
 As the stacked autoencoder differs from a deep one only by training procedure, it has the same reconstruction function, too.
 Again, we have no restrictions on the latent space, but the encoding is expected to be worse due to the greedy training procedure.
 
@@ -139,14 +141,16 @@ The complete loss for the sparse autoencoder combines the reconstruction loss an
 
 $$L = L_r + \beta L_s$$
 
+We will set $$p$$ to 0.25 and $$\beta$$ to one for all experiments.
+
 ### Denoising Autoencoder
 
 The denoising autoencoder does not restrict the latent space but aims to learn a more efficient encoding through applying noise to the input data.
 Instead of feeding the input data straight to the network, we add Gaussian noise as follows:
 
-$$x' = \operatorname{clip} (x + \mathcal{N}(0;\operatorname{diag}(\mathbf{I}))) $$
+$$x' = \operatorname{clip} (x + \mathcal{N}(0;\operatorname{diag}(\beta\mathbf{I}))) $$
 
-where $$\operatorname{clip}$$ is clipping its input to $$[0, 1]$$.
+where $$\operatorname{clip}$$ is clipping its input to $$[0, 1]$$ and the scalar $$\beta$$ is the variance of the noise.
 Hence, the autoencoder is trained on reconstructing clean samples from a noisy version.
 The reconstruction formula is:
 
@@ -155,6 +159,7 @@ $$\hat{x} = \operatorname{dec}(\operatorname{enc}(x'))$$
 We use the noisy input exclusively in training.
 When evaluating the autoencoder, we feed it the original input data.
 Otherwise, the denoising autoencoder uses the same loss function as the ones before.
+For all experiments, $$\beta$$ is set to 0.5.
 
 ### Variational Autoencoder
 
@@ -232,6 +237,8 @@ A Kulback-Leibler divergence loss is not necessary, as the divergence would be a
 Both losses are combined with the reconstruction loss by a hyperparameter $$\beta$$ controlling the influence of the commitment loss:
 
 $$L = L_r + L_{vq} + \beta L_c$$
+
+We set $$\beta$$ to one for all experiments.
 
 Because the vq-VAE is a generative model, we can sample from it unconditionally, too.
 In the original paper, a pixel-CNN is used to autoregressively sample a latent code.
