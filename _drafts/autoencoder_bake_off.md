@@ -459,9 +459,9 @@ We rely on the fact that samples too dissimilar to the training data cannot be r
 If our latent space generalizes too well, we are hurting our anomaly detection performance.
 
 The ability of an autoencoder to generalize is dependent on its encoder and decoder capacity, as well as the dimensionality of the latent space.
-We already lowered the dimensionality of the latent space to two, so there is not much room to go lower.
+We already lowered the dimensionality of the latent space to two for the anomaly detection, so there is not much room to go lower.
 Through its limited capacity, the shallow autoencoder struck the right balance of how well it modeled the training data.
-The stacked autoencoder's greedy layer-wise training is limiting its ability generalize in a similar way.
+The stacked autoencoder's greedy layer-wise training is limiting its ability to generalize in a similar way.
 
 In the end, we may have to conclude that MNIST is just too damn easy.
 The deep autoencoders have much more capacity than it is helpful for this dataset.
