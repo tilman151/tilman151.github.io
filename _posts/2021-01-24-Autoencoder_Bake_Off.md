@@ -256,11 +256,11 @@ For this, we can have a look at the 16 first images of the MNIST test set.
 
 |shallow|vanilla|stacked|sparse|denoising|
 |:-----:|:-----:|:-----:|:----:|:-------:|
-|<img alt="Shallow AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/shallow.jpeg" style="max-width:unset;"/>| <img alt="Vanilla AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/vanilla.jpeg" style="max-width:unset;"/>| <img alt="Stacked AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/stacked.jpeg" style="max-width:unset;"/>|<img alt="Sparse AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/sparse.jpeg" style="max-width:unset;"/>|   <img alt="Denoising AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/denoising.jpeg" style="max-width:unset;"/>|
+|<img alt="Shallow AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/shallow.jpeg" style="max-width:unset;"/>| <img alt="Vanilla AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vanilla.jpeg" style="max-width:unset;"/>| <img alt="Stacked AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/stacked.jpeg" style="max-width:unset;"/>|<img alt="Sparse AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/sparse.jpeg" style="max-width:unset;"/>|   <img alt="Denoising AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/denoising.jpeg" style="max-width:unset;"/>|
 
 | vae  |beta_vae_strict|beta_vae_loose|  vq  |
 |:----:|:-------------:|:------------:|:----:|
-|<img alt="VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/vae.jpeg" style="max-width:unset;"/>|         <img alt="Strict beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/beta_vae_strict.jpeg" style="max-width:unset;"/>|<img alt="Loose beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reconstructions/vq.jpeg" style="max-width:unset;"/>|
+|<img alt="VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vae.jpeg" style="max-width:unset;"/>|         <img alt="Strict beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/beta_vae_strict.jpeg" style="max-width:unset;"/>|<img alt="Loose beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vq.jpeg" style="max-width:unset;"/>|
 
 The shallow autoencoder fails to reconstruct many of the test samples correctly.
 Fours and nines are barely distinguishable, and some digits are not recognizable at all.
@@ -300,11 +300,11 @@ The latent codes for the vq-VAE will be sampled uniformly from their learned cat
 
 | vae  |beta_vae_strict|
 |:----:|:-------------:|
-|<img alt="VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/samples/vae.jpeg" style="max-width:unset;"/>|<img alt="Strict beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/samples/beta_vae_strict.jpeg" style="max-width:unset;"/>
+|<img alt="VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/vae.jpeg" style="max-width:unset;"/>|<img alt="Strict beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/beta_vae_strict.jpeg" style="max-width:unset;"/>
 
 |beta_vae_loose|  vq  |
 |:------------:|:----:|
-|<img alt="Loose beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/samples/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/samples/vq.jpeg" style="max-width:unset;"/>|
+|<img alt="Loose beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/vq.jpeg" style="max-width:unset;"/>|
 
 None of them look pretty, but we can glance at some differences, nonetheless.
 The most meaningful samples were generated by the strict beta-VAE.
@@ -335,15 +335,15 @@ For the vq-VAE, we first interpolate and then quantize.
 
 |shallow|vanilla|stacked|
 |:-----:|:-----:|:-----:|
-|<img alt="Shallow Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/shallow.gif" style="max-width:unset;width:64px;"/>|<img alt="Vanilla Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/vanilla.gif" style="max-width:unset;width:64px;"/>|<img alt="Stacked Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/stacked.gif" style="max-width:unset;width:64px;"/>|
+|<img alt="Shallow Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/shallow.gif" style="max-width:unset;width:64px;"/>|<img alt="Vanilla Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vanilla.gif" style="max-width:unset;width:64px;"/>|<img alt="Stacked Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/stacked.gif" style="max-width:unset;width:64px;"/>|
 
 |sparse|denoising| vae |
 |:----:|:-------:|:---:|
-|<img alt="Sparse Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/sparse.gif" style="max-width:unset;width:64px;"/>|<img alt="Denoising Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/denoising.gif" style="max-width:unset;width:64px;"/>|<img alt="VAE Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/vae.gif" style="max-width:unset;width:64px;"/>|
+|<img alt="Sparse Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/sparse.gif" style="max-width:unset;width:64px;"/>|<img alt="Denoising Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/denoising.gif" style="max-width:unset;width:64px;"/>|<img alt="VAE Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vae.gif" style="max-width:unset;width:64px;"/>|
 
 |beta_strict|beta_loose| vq  |
 |:-------------:|:------------:|:---:|
-|<img alt="Beta Strict Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/beta_vae_strict.gif" style="max-width:unset;width:64px;"/>|<img alt="Beta Loose Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/beta_vae_loose.gif" style="max-width:unset;width:64px;"/>|<img alt="VQ Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/interpolation/vq.gif" style="max-width:unset;width:64px;"/>|
+|<img alt="Beta Strict Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/beta_vae_strict.gif" style="max-width:unset;width:64px;"/>|<img alt="Beta Loose Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/beta_vae_loose.gif" style="max-width:unset;width:64px;"/>|<img alt="VQ Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vq.gif" style="max-width:unset;width:64px;"/>|
 
 Above you can see GIFs looping through the interpolated images back and forth, briefly stopping at the original images.
 We can see that the VAE and beta-VAEs produce relatively meaningful interpolations, going from a two over something looking threeish to a seven.
@@ -366,7 +366,7 @@ In the picture below, you can see a scatter plot for each of our autoencoders' l
 Each point is the latent code for one image from the test set and the color represents the digit in the image.
 The scales of the x- and y-axis don't have any specific meaning.
 
-![Latent Space Visualization in 2D](https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/reduction.png)
+![Latent Space Visualization in 2D](https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reduction.png)
 
 There are some obvious similarities between the plots.
 First of all, we can see that the plots of vanilla, stacked, sparse, denoising, and vq-VAE are quite similar if we ignore different rotations.
@@ -448,7 +448,7 @@ If any of the correlations are not holding for a test sample, the autoencoder wi
 An obvious challenge for this task is to find the optimal threshold for the anomaly score to consider a sample an anomaly.
 We will leave this problem for someone else to solve (as most publications do, too) and report the ROC plot and the area under the curve (AUC).
 
-![Anomaly Results with ROC plots and AUC](https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/anomaly.png)
+![Anomaly Results with ROC plots and AUC](https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/anomaly.png)
 
 The results of this last task came as a bit of a surprise for me.
 I did some digging for bugs, but I am sure now that they are valid.
