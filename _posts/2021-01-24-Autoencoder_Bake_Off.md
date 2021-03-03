@@ -41,6 +41,7 @@ The following types have made the cut:
 
 Aside from describing what makes each of them unique, we will compare them in the following categories:
 
+- **(Update 03.03.2021)** Training time
 - Reconstruction quality
 - Quality of decoded samples from the latent space (if possible)
 - Quality of latent space interpolation
@@ -248,6 +249,29 @@ For simplicity's sake, we will sample by drawing categories uniformly.
 
 Now that we know who we are dealing with, let's see how they fare in our gauntlet of tasks.
 Besides the standard ones like reconstruction quality, we will have a look at semi-supervised classification and anomaly detection, too.
+
+### Training Time
+
+**(Update 03.03.2021)**
+As per feedback from Reddit, we are going to look at the training times of the autoencoders.
+The time was not recorded directly because we would need to rerun the experiments to do that.
+Instead, we are using the TensorBoard event files and calculate the time between the first training loss and last validation loss logged.
+This gives us only an offset of the iteration time of the first training batch.
+The times should, therefore, be interpreted as the time to run 60 epochs with validation after each one.
+
+|   shallow    |   vanilla    |   stacked    |    sparse    |  denoising   |
+|:------------:|:------------:|:------------:|:------------:|:------------:|
+|0:10:38       |0:11:15       |0:11:05       |0:11:27       |0:11:18       |
+
+|     vae      |beta_vae_strict|beta_vae_loose|      vq      |
+|:------------:|:-------------:|:------------:|:------------:|
+|0:11:30       |0:11:29        |0:11:28       |0:11:27       |
+
+Unsurprisingly, there is not much of a difference.
+Even the shallow autoencoder, that is much smaller, takes only about half a minute more.
+This indicates that the time for the forward and backward passes is much smaller than the overhead of data loading, logging, etc.
+Some variation can be attributed to this being computed on a Windows machine, too.
+Who knows what background process is hogging resources at any given time?
 
 ### Reconstruction
 
