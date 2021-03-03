@@ -268,7 +268,7 @@ The times should, therefore, be interpreted as the time to run 60 epochs with va
 |0:11:30       |0:11:29        |0:11:28       |0:11:27       |
 
 Unsurprisingly, there is not much of a difference.
-Even the shallow autoencoder, that is much smaller, takes only about half a minute more.
+Even the shallow autoencoder, that is much smaller, takes only about half a minute less time.
 This indicates that the time for the forward and backward passes is much smaller than the overhead of data loading, logging, etc.
 Some variation can be attributed to this being computed on a Windows machine, too.
 Who knows what background process is hogging resources at any given time?
