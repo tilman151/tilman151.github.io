@@ -87,7 +87,22 @@ They can all be labeled trivially.
 The only reason any time series in our data would be unlabeled is if it did not contain the point of failure.
 The logical design choice would, therefore, be to discard part of the time series alongside the label, starting at the end of the series.
 
+<figure>
+  <img src="{{site.url}}/assets/img/sensor10.png" alt="my alt text"/>
+  <figcaption>
+    <em>
+        <b>Distribution of sensor 10 in subset FD001 of the NASA C-MAPSS dataset:</b>
+        Half of the time series is assumed to be labeled (blue) and the other half unlabeled (green, orange).
+        We can see how the feature distribution is shifted for the unlabeled data if only 80% (orange) of the first time steps are available or 60% (green).
+    </em>
+  </figcaption>
+</figure>
+
 This makes the problem fascinating to work on, because it invalidates some assumptions of semi-supervised learning and unsupervised-domain adaption.
+The figure above shows how the discarded failure data impacts the distribution of an examplary feature.
+The distribution shift seems worse going from 100% to 80% than going from 80% to 60%.
+This trend is consistent when reducing the data even further and underlines the importance of near failure data for capturing the whole feature distribution.
+
 SSL assumes that the labeled and unlabeled data comes from the same generating distribution.
 Without data from the failure points, the unlabeled data comes from a truncated version of the generating distribution, which may affect training.
 An autoencoder used for unsupervised pre-training, for example, would focus more on learning the healthy state because it is now even more abundant in the data.
@@ -99,7 +114,7 @@ The problem here is that we do not only have a distribution shift between labele
 In the most extreme case, where we discard a lot of the unlabeled time series, this may lead to a worse performance compared to not using the unlabeled data at all.
 This is also known as negative transfer.
 
-That UDA methods suffer under these conditions was already shown on the NASA C-MAPSS dataset, a popular benchmark for RUL estimation ([LINK](https://doi.org/10.1109/ICPHM49022.2020.9187058)).
+That UDA methods suffer under these conditions was already shown on the NASA C-MAPSS dataset, a popular RUL estimation benchmark ([Link](https://doi.org/10.1109/ICPHM49022.2020.9187058)).
 This is a shameless plug, because it's, obviously, my own work.
 We can see in this paper how the performance of the two investigated UDA algorithms degrades with less data near failure.
 If you don't have access to IEEE Xplore and want a copy of the paper, just shoot me a message.
