@@ -143,4 +143,4 @@ As ML practitioners we should definitely draw inspiration and best practices fro
 There is no need to reinvent the wheel, but you should be certain that a wheel is what you need.
 
 The insights in this post may be mundane and in the end pretty obvious.
-But you know what they say: in the country of the blindly copying the one-eyed is king.
+But you know what they say: in the country of the blindly copying, the one-eyed is king.
