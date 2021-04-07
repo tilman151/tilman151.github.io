@@ -141,3 +141,6 @@ The holy grail would be a method that can even draw knowledge from healthy machi
 On a more general note, we have seen how a whole line of research (albeit a young one) can fall into the trap of blindly copying state-of-the-art methods.
 As ML practitioners we should definitely draw inspiration and best practices from other fields, but it is no replacement for understanding your data and how your model will be used.
 There is no need to reinvent the wheel, but you should be certain that a wheel is what you need.
+
+The insights in this post may be mundane and in the end pretty obvious.
+But you know what they say: in the country of the blindly copying the one-eyed is king.
