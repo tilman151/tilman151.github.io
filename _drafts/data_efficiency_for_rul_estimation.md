@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "About Keeping Your Use Case in Focus"
+title: "About Copying Blindly - Insights of the One-Eyed Person"
 categories: research
 ---
 
@@ -20,8 +20,9 @@ Last, we will see how the current literature fails to do so by naïvely copying 
 
 ## Predictive Maintenance, Prognostics, and Remaining Useful Lifetime Estimation
 
-Predictive maintenance (PDM) or sometimes called condition-based maintenance (CBM) is scheduling maintenance for machines based on the automatic prediction of a fault condition.
-The aim is to reduce the cost of repair and avoid downtime of the machine.
+Predictive maintenance (PDM) or sometimes called condition-based maintenance (CBM) a smart kind of maintenance scheduling.
+Instead of waiting for a machine to fail and suffer downtime, or repairing the machine in a set time interval to avoid downtime at all costs, PDM monitors the health status of the machine to anticipate failure.
+This aims to minimize both downtime and costs of repair.
 Traditionally, there are ways to predict the machine status through physical models or expert systems, but we will focus on data-driven approaches (i.e. deep neural networks).
 
 Most times, the data used for PDM are multivariate time series.
@@ -29,15 +30,15 @@ The channels of the series constitute of sensor readings during operation (e.g. 
 Label information is mostly provided as one label for each series.
 Naturally, PDM data is imbalanced in favor of data from healthy, normally running machines.
 Data from failing machines is much rarer, as failures should be the exception, not the norm.
-Benchmark datasets often contain several subsets, where the machine is the same but working conditions are different.
+Benchmark datasets often contain several subsets, where the machine is the same but working conditions (e.g. load on an engine) are different.
 This makes it possible to test models against domain shift.
 
 Broadly, we can divide PDM tasks into two categories based on when to predict, relative to the point of failure.
 *Diagnostics* aims to predict if the system is running normally or if a fault is present.
 This is normally framed as a classification problem with *n+1* classes, one for the normal state and one for each fault.
 *Prognostics*, on the other hand, tries to predict when the point of failure will occur in the future.
-This family of tasks is much harder as we have to detect an onsetting failure before it even occurs.
-Obviously, prognostics is limited to degradation type failures, e.g. wear on a bearing, because it is impossible to predict sudden-onset failures like a goose flying into a jet engine.
+This family of tasks is much harder as we have to detect an upcoming failure before it even occurs.
+Obviously, prognostics is limited to degradation type failures, e.g. wear on a bearing. It would be impossible to predict sudden-onset failures like a goose flying into a jet engine.
 
 <figure>
   <img src="{{site.url}}/assets/img/feat_rul.png" alt="A plot of the sensor 10 and the RUL over time for one time series. The RUL is linearly decreasing, while the sensor readings are increasing non-linearly."/>
@@ -50,7 +51,7 @@ Obviously, prognostics is limited to degradation type failures, e.g. wear on a b
   </figcaption>
 </figure>
 
-Prognostics problems are often framed as regression tasks, where we predict the remaining number of equally long operation cycles until the machine breaks.
+Prognostics problems, the ones I care about, are often framed as regression tasks, where we predict the remaining number of equally long operation cycles until the machine breaks.
 This is called remaining useful lifetime (RUL) estimation.
 While there are several approaches to do RUL estimation, we will focus on the most direct approach, where we use a DNN to predict the RUL.
 For all math fetishists out there, we try to model $$P(RUL|X)$$ with a function $$f_\Theta(x_t) = \operatorname{rul}_t$$ where $$f_\Theta$$ is a neural network parametrized by the weight vector $$\Theta$$, $$x_t$$ is a multivariate time series until time step $$t$$ and $$rul_t$$ the RUL at the same time step.
@@ -67,15 +68,15 @@ The label information here is the remaining lifetime at each step of the time se
 Obviously, we can only calculate the labels if $$t_{max}$$ is known, i.e. the machine failed.
 Considering that failure occurs only after significant time, we can see that we accumulate a lot of unlabeled data before we can assign a label.
 
-Abundant unlabeled data cries for semi-supervised learning (SSL) methods, so many approaches were tested in recent years.
+Abundant unlabeled data cries for *semi-supervised learning (SSL)* methods, so many approaches were tested in recent years.
 I found unsupervised pre-training with autoencoders, variational autoencoders, or restricted Boltzmann machines.
 The basic idea is to take your unlabeled data and use an unsupervised learning technique to get a feature extraction network.
 Then you add a regression network on top of it and fine-tune the whole thing on your labeled data.
 The main factor influencing performance here is the amount of available labeled data, so the approaches are tested by using different percentages of the dataset as labeled and the rest as unlabeled.
 Up until now, reported performance improvements are minimal.
 
-Others took it one step further and used unsupervised domain adaption (UDA) methods.
-Unsupervised domain adaption can be seen as a generalization of SSL where the labeled and unlabeled don't need to be from the same generating distribution.
+Others took it one step further and used *unsupervised domain adaption (UDA)* methods.
+Unsupervised domain adaption can be seen as a generalization of SSL where the labeled and unlabeled data don't need to be from the same generating distribution.
 Researchers adopted approaches using adversarial and maximum mean discrepancy metrics that were popularized in the computer vision space.
 The setup here is to take one subset of your data (divided by working conditions) as labeled and the other as unlabeled.
 The aim is to minimize the prediction error on the unlabeled data.
@@ -83,12 +84,12 @@ Performance improvements for these methods are pretty significant, although the 
 
 ## Why All of This Doesn't Matter
 
-Okay, we take established methods from other fields, apply them to ours and get results that are negligible to decent.
+Okay, we take established methods from other fields, apply them to ours and get results that are somewhere between negligible and decent.
 So far, so good.
-The problem is that none of these results are accurate at all, because the experimental design was adopted alongside the methods without thinking it through.
+The problem is that none of these results are meaningful at all, because the experimental design was adopted alongside the methods without thinking it through.
 The offending design choice lies in how the datasets were prepared for these experiments.
 
-There is no RUL estimation benchmark dataset for this kind of work, so researchers made do with adapting existing ones.
+There is no RUL estimation benchmark dataset, so researchers made do with adapting existing ones.
 They took a dataset of labeled time series and partitioned it into a labeled and an unlabeled portion.
 For the unlabeled portion, they simply discarded the existing labels.
 If this had been an image dataset, it would be fine, but remember how labels are calculated for RUL estimation.
