@@ -24,8 +24,8 @@ Krokotsch, T., Knaak, M., & Gühmann, C. (2020).
 **A Novel Evaluation Framework for Unsupervised Domain Adaption on Remaining Useful Lifetime Estimation.**
 In *2020 IEEE International Conference on Prognostics and Health Management (ICPHM)*. IEEE.
 
-### 2021
+### 2022
 
-Krokotsch, T., Knaak, M., & Gühmann, C. (2021).
+Krokotsch, T., Knaak, M., & Gühmann, C. (2022).
 **Improving Semi-Supervised Learning for Remaining Useful Lifetime Estimation Through Self-Supervision.**
-*arXiv preprint* arXiv:2108.08721.
+*International Journal of Prognostics and Health Management*, 13(1).
