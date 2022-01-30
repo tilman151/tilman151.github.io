@@ -32,6 +32,10 @@
     }
 
     if(readCookie('cookie-notice-dismissed')=='true') {
+        var clicky_site_ids = clicky_site_ids || []; clicky_site_ids.push(101271854);
+        var s = document.createElement('script');
+        s.src = "https://static.getclicky.com/js"
+        document.head.appendChild(s)
     } else {
         document.getElementById('cookie-notice').style.display = 'block';
     }
@@ -42,5 +46,4 @@
     });
 </script>
 
-<script>var clicky_site_ids = clicky_site_ids || []; clicky_site_ids.push(101271854);</script>
-<script async src="//static.getclicky.com/js"></script>
+
