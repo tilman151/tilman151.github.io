@@ -1,0 +1,36 @@
+baseURL: https://krokotsch.eu/
+languageCode: en-us
+title: Don't Repeat Yourself
+theme: "PaperMod"
+
+params:
+    homeInfoParams:
+        Title: Hi, I'm Tilman
+        Content: Ph.D. student of deep learning at TU Berlin. On this personal blog I will write about deep learning and coding topics that keep me up at night. Obviously there will be updates on my ongoing research, too.
+
+    DateFormat: "2 January 2006"
+        
+    socialIcons:
+        - name: email
+          url: "mailto:tilman.krokotsch@tu-berlin.de"
+        - name: github
+          url: "https://github.com/tilman151"
+        - name: linkedin
+          url: "https://www.linkedin.com/in/tilman-krokotsch-51a335152"
+
+
+    assets:
+        favicon: "/img/favicon.ico"
+        favicon16x16:  "/img/favicon-16x16.png"
+        favicon32x32:  "/img/favicon-32x32.png"
+        apple_touch_icon:  "/img/apple-touch-icon.png"
+        safari_pinned_tab:  "/img/safari-pinned-tab.svg"
+    
+    ShowReadingTime: true
+
+menu:
+  main:
+    - identifier: publications
+      name: Publications
+      url: /publications/
+      weight: 10
