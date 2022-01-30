@@ -1,0 +1,206 @@
+<!doctype html><html lang=en dir=auto>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=robots content="index, follow">
+<title>About Copying Blindly - Insights of the One-Eyed Person | Don't Repeat Yourself</title>
+<meta name=keywords content="research">
+<meta name=description content="Today I have no fancy project and no shiny GitHub repository to show because today I want to talk about my research. As some may read in my bio, I am doing my PhD in the field of predictive maintenance (PDM). This field is directly adjacent to machine learning and fell, like many others, into the grasp of the deep learning hype. Unfortunately, long series of sensor readings are not as interesting to look at as images or intuitively understood as natural language, so PDM is not as present in the mind of the general ML crowd.">
+<meta name=author content>
+<link rel=canonical href=https://krokotsch.eu/posts/about-copying-blindly/>
+<link crossorigin=anonymous href=/assets/css/stylesheet.min.d96b26af08d2675aeb380036e8e050174335af01efa27b67dbf48b2f6d9b35d7.css integrity="sha256-2WsmrwjSZ1rrOAA26OBQF0M1rwHvontn2/SLL22bNdc=" rel="preload stylesheet" as=style>
+<script defer crossorigin=anonymous src=/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5+kdJvBz5iKbt6B5PJI=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=https://krokotsch.eu/img/favicon.ico>
+<link rel=icon type=image/png sizes=16x16 href=https://krokotsch.eu/img/favicon-16x16.png>
+<link rel=icon type=image/png sizes=32x32 href=https://krokotsch.eu/img/favicon-32x32.png>
+<link rel=apple-touch-icon href=https://krokotsch.eu/img/apple-touch-icon.png>
+<link rel=mask-icon href=https://krokotsch.eu/img/safari-pinned-tab.svg>
+<meta name=theme-color content="#2e2e33">
+<meta name=msapplication-TileColor content="#2e2e33">
+<meta name=generator content="Hugo 0.92.1">
+<noscript>
+<style>#theme-toggle,.top-link{display:none}</style>
+<style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--hljs-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style>
+</noscript><script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']],processEscapes:!0,processEnvironments:!0},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}},window.addEventListener('load',a=>{document.querySelectorAll("mjx-container").forEach(function(a){a.parentElement.classList+='has-jax'})})</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type=text/javascript id=MathJax-script async src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js></script>
+<meta property="og:title" content="About Copying Blindly - Insights of the One-Eyed Person">
+<meta property="og:description" content="Today I have no fancy project and no shiny GitHub repository to show because today I want to talk about my research. As some may read in my bio, I am doing my PhD in the field of predictive maintenance (PDM). This field is directly adjacent to machine learning and fell, like many others, into the grasp of the deep learning hype. Unfortunately, long series of sensor readings are not as interesting to look at as images or intuitively understood as natural language, so PDM is not as present in the mind of the general ML crowd.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://krokotsch.eu/posts/about-copying-blindly/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-04-07T00:00:00+00:00">
+<meta property="article:modified_time" content="2021-04-07T00:00:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="About Copying Blindly - Insights of the One-Eyed Person">
+<meta name=twitter:description content="Today I have no fancy project and no shiny GitHub repository to show because today I want to talk about my research. As some may read in my bio, I am doing my PhD in the field of predictive maintenance (PDM). This field is directly adjacent to machine learning and fell, like many others, into the grasp of the deep learning hype. Unfortunately, long series of sensor readings are not as interesting to look at as images or intuitively understood as natural language, so PDM is not as present in the mind of the general ML crowd.">
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://krokotsch.eu/posts/"},{"@type":"ListItem","position":2,"name":"About Copying Blindly - Insights of the One-Eyed Person","item":"https://krokotsch.eu/posts/about-copying-blindly/"}]}</script>
+<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"About Copying Blindly - Insights of the One-Eyed Person","name":"About Copying Blindly - Insights of the One-Eyed Person","description":"Today I have no fancy project and no shiny GitHub repository to show because today I want to talk about my research. As some may read in my bio, I am doing my PhD in the field of predictive maintenance (PDM). This field is directly adjacent to machine learning and fell, like many others, into the grasp of the deep learning hype. Unfortunately, long series of sensor readings are not as interesting to look at as images or intuitively understood as natural language, so PDM is not as present in the mind of the general ML crowd.","keywords":["research"],"articleBody":"Today I have no fancy project and no shiny GitHub repository to show because today I want to talk about my research. As some may read in my bio, I am doing my PhD in the field of predictive maintenance (PDM). This field is directly adjacent to machine learning and fell, like many others, into the grasp of the deep learning hype. Unfortunately, long series of sensor readings are not as interesting to look at as images or intuitively understood as natural language, so PDM is not as present in the mind of the general ML crowd. Maybe this post can shed a little light on this corner of the research world.\nBut, this post is not only about my research. It is about the mindset an ML practitioner has to maintain when it comes to problems outside the commonly represented fields (i.e. CV and NLP). Maybe “Be aware of your data and use case.\" would be a fitting tl;dr, but I think to really get what it means I have to go a bit further in my explanation. Our road map is pretty simple. First, we take a short tour of the field of PDM and define the specific task I am researching, remaining useful lifetime (RUL) estimation. Second, we investigate the problem with this task and how to alleviate it. Last, we will see how the current literature fails to do so by naïvely copying deep learning techniques from other fields.\nPredictive Maintenance, Prognostics, and Remaining Useful Lifetime Estimation Predictive maintenance (PDM) or sometimes called condition-based maintenance (CBM) a smart kind of maintenance scheduling. Instead of waiting for a machine to fail and suffer downtime, or repairing the machine in a set time interval to avoid downtime at all costs, PDM monitors the health status of the machine to anticipate failure. This aims to minimize both downtime and costs of repair. Traditionally, there are ways to predict the machine status through physical models or expert systems, but we will focus on data-driven approaches (i.e. deep neural networks).\nMost times, the data used for PDM are multivariate time series. The channels of the series constitute of sensor readings during operation (e.g. vibration or temperature) or test readings done at specific time intervals. Label information is mostly provided as one label for each series. Naturally, PDM data is imbalanced in favor of data from healthy, normally running machines. Data from failing machines is much rarer, as failures should be the exception, not the norm. Benchmark datasets often contain several subsets, where the machine is the same but working conditions (e.g. load on an engine) are different. This makes it possible to test models against domain shift.\nBroadly, we can divide PDM tasks into two categories based on when to predict, relative to the point of failure. Diagnostics aims to predict if the system is running normally or if a fault is present. This is normally framed as a classification problem with n+1 classes, one for the normal state and one for each fault. Prognostics, on the other hand, tries to predict when the point of failure will occur in the future. This family of tasks is much harder as we have to detect an upcoming failure before it even occurs. Obviously, prognostics is limited to degradation type failures, e.g. wear on a bearing. It would be impossible to predict sudden-onset failures like a goose flying into a jet engine.\n   Readings of sensor 10 and RUL of the first time series in subset FD001 of the NASA C-MAPSS dataset: We can see that the RUL is a simple linear function of time. The sensor readings behave non-linear and are afflicted with noise.    Prognostics problems, the ones I care about, are often framed as regression tasks, where we predict the remaining number of equally long operation cycles until the machine breaks. This is called remaining useful lifetime (RUL) estimation. While there are several approaches to do RUL estimation, we will focus on the most direct approach, where we use a DNN to predict the RUL. For all math fetishists out there, we try to model $P(RUL|X)$ with a function $f_\\Theta(x_t)=\\operatorname{rul}_t$ where $f_\\Theta$ is a neural network parametrized by the weight vector $\\Theta$, $x_t$ is a multivariate time series until time step $t$ and $rul_t$ the RUL at the same time step.\nLabeling is Hard As mentioned before, PDM data is highly imbalanced. The majority of the data is from healthy machines and only a few samples from failing machines are available. This leads to a lot of research effort toward trying to use the existing data more efficiently.\nRUL estimation has an additional problem. The data consists of time series of sensor readings from the last repair ($t=0$) to the point of failure ($t_{max}$). The label information here is the remaining lifetime at each step of the time series defined as $RUL(t) = t_{max} - t$. Obviously, we can only calculate the labels if $t_{max}$ is known, i.e. the machine failed. Considering that failure occurs only after significant time, we can see that we accumulate a lot of unlabeled data before we can assign a label.\nAbundant unlabeled data cries for semi-supervised learning (SSL) methods, so many approaches were tested in recent years. I found unsupervised pre-training with autoencoders, variational autoencoders, or restricted Boltzmann machines. The basic idea is to take your unlabeled data and use an unsupervised learning technique to get a feature extraction network. Then you add a regression network on top of it and fine-tune the whole thing on your labeled data. The main factor influencing performance here is the amount of available labeled data, so the approaches are tested by using different percentages of the dataset as labeled and the rest as unlabeled. Up until now, reported performance improvements are minimal.\nOthers took it one step further and used unsupervised domain adaption (UDA) methods. Unsupervised domain adaption can be seen as a generalization of SSL where the labeled and unlabeled data don’t need to be from the same generating distribution. Researchers adopted approaches using adversarial and maximum mean discrepancy metrics that were popularized in the computer vision space. The setup here is to take one subset of your data (divided by working conditions) as labeled and the other as unlabeled. The aim is to minimize the prediction error on the unlabeled data. Performance improvements for these methods are pretty significant, although the performance is still outside the range of where one would consider it for productive use.\nWhy All of This Doesn’t Matter Okay, we take established methods from other fields, apply them to ours and get results that are somewhere between negligible and decent. So far, so good. The problem is that none of these results are meaningful at all, because the experimental design was adopted alongside the methods without thinking it through. The offending design choice lies in how the datasets were prepared for these experiments.\nThere is no RUL estimation benchmark dataset, so researchers made do with adapting existing ones. They took a dataset of labeled time series and partitioned it into a labeled and an unlabeled portion. For the unlabeled portion, they simply discarded the existing labels. If this had been an image dataset, it would be fine, but remember how labels are calculated for RUL estimation. The only thing you need is the time of failure $t_{max}$, and you can label each time step in the series. This means considering any of the time series in our data unlabeled as-is would be highly unrealistic. They can all be labeled trivially. The only reason any time series in our data would be unlabeled is if it did not contain the point of failure. The logical design choice would, therefore, be to discard part of the time series alongside the label, starting at the end of the series.\n  Distribution of sensor 10 in subset FD001 of the NASA C-MAPSS dataset: Half of the time series is assumed to be labeled (blue) and the other half unlabeled (green, orange). We can see how the feature distribution is shifted for the unlabeled data if only 80% (orange) of the first time steps are available or 60% (green).   This makes the problem fascinating to work on because it invalidates some assumptions of semi-supervised learning and unsupervised-domain adaption. The figure above shows how the discarded failure data impacts the distribution of an exemplary feature. The distribution shift seems worse going from 100% to 80% than going from 80% to 60%. This trend is consistent when reducing the data even further and underlines the importance of near failure data for capturing the whole feature distribution.\nSSL assumes that the labeled and unlabeled data comes from the same generating distribution. Without data from the failure points, the unlabeled data comes from a truncated version of the generating distribution, which may affect training. An autoencoder used for unsupervised pre-training, for example, would focus more on learning the healthy state because it is now even more abundant in the data. This, in turn, leads to worse representations for the failure state.\nUDA frees itself from the assumption of matching distributions but still suffers all the same. The UDA methods used up until now are all feature-based, meaning that they try to match the distributions of extracted features from labeled and unlabeled data. The problem here is that we do not only have a distribution shift between labeled and unlabeled data but between training and test data, too, as the test set will contain data near the failure point. In the most extreme case, where we discard a lot of the unlabeled time series, this may lead to a worse performance compared to not using the unlabeled data at all. This is also known as negative transfer.\nThat UDA methods suffer under these conditions was already shown on the NASA C-MAPSS dataset, a popular RUL estimation benchmark (Link). This is a shameless plug, because it’s, obviously, my own work. We can see in this paper how the performance of the two investigated UDA algorithms degrades with fewer data near failure. If you don’t have access to IEEE Xplore and want a copy of the paper, just shoot me a message.\nLessons Learned We now see, that the experimental design used for SSL and UDA probably overestimates the test performance, but the fix is relatively simple. Instead of discarding only the label, we discard parts of the unlabeled time series, too. This leads to the question of how much of the time series we can discard or in other words, how far out from failure can a machine be to be useful to our method. The holy grail would be a method that can even draw knowledge from healthy machines alone, but even a method that can use data from machines halfway to failure would be a huge improvement.\nOn a more general note, we have seen how a whole line of research (albeit a young one) can fall into the trap of blindly copying state-of-the-art methods. As ML practitioners we should definitely draw inspiration and best practices from other fields, but it is no replacement for understanding your data and how your model will be used. There is no need to reinvent the wheel, but you should be certain that a wheel is what you need.\nThe insights in this post may be mundane and in the end pretty obvious. But you know what they say: in the country of the blindly copying, the one-eyed is king.\n","wordCount":"1913","inLanguage":"en","datePublished":"2021-04-07T00:00:00Z","dateModified":"2021-04-07T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://krokotsch.eu/posts/about-copying-blindly/"},"publisher":{"@type":"Organization","name":"Don't Repeat Yourself","logo":{"@type":"ImageObject","url":"https://krokotsch.eu/img/favicon.ico"}}}</script>
+</head>
+<body id=top>
+<script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add('dark'):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove('dark'):window.matchMedia('(prefers-color-scheme: dark)').matches&&document.body.classList.add('dark')</script>
+<header class=header>
+<nav class=nav>
+<div class=logo>
+<a href=https://krokotsch.eu/ accesskey=h title="Don't Repeat Yourself (Alt + H)">Don't Repeat Yourself</a>
+<span class=logo-switches>
+<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</span>
+</div>
+<ul id=menu>
+<li>
+<a href=https://krokotsch.eu/publications/ title=Publications>
+<span>Publications</span>
+</a>
+</li>
+</ul>
+</nav>
+</header>
+<main class=main>
+<article class=post-single>
+<header class=post-header>
+<h1 class=post-title>
+About Copying Blindly - Insights of the One-Eyed Person
+</h1>
+<div class=post-meta><span title="2021-04-07 00:00:00 +0000 UTC">7 April 2021</span>&nbsp;·&nbsp;9 min
+</div>
+</header>
+<div class=post-content><p>Today I have no fancy project and no shiny GitHub repository to show because today I want to talk about my research.
+As some may read in my bio, I am doing my PhD in the field of predictive maintenance (PDM).
+This field is directly adjacent to machine learning and fell, like many others, into the grasp of the deep learning hype.
+Unfortunately, long series of sensor readings are not as interesting to look at as images or intuitively understood as natural language, so PDM is not as present in the mind of the general ML crowd.
+Maybe this post can shed a little light on this corner of the research world.</p>
+<p>But, this post is not only about my research.
+It is about the mindset an ML practitioner has to maintain when it comes to problems outside the commonly represented fields (i.e. CV and NLP).
+Maybe <em>&ldquo;Be aware of your data and use case."</em> would be a fitting <em>tl;dr</em>, but I think to really get what it means I have to go a bit further in my explanation.
+Our road map is pretty simple.
+First, we take a short tour of the field of PDM and define the specific task I am researching, remaining useful lifetime (RUL) estimation.
+Second, we investigate the problem with this task and how to alleviate it.
+Last, we will see how the current literature fails to do so by naïvely copying deep learning techniques from other fields.</p>
+<h2 id=predictive-maintenance-prognostics-and-remaining-useful-lifetime-estimation>Predictive Maintenance, Prognostics, and Remaining Useful Lifetime Estimation<a hidden class=anchor aria-hidden=true href=#predictive-maintenance-prognostics-and-remaining-useful-lifetime-estimation>#</a></h2>
+<p>Predictive maintenance (PDM) or sometimes called condition-based maintenance (CBM) a smart kind of maintenance scheduling.
+Instead of waiting for a machine to fail and suffer downtime, or repairing the machine in a set time interval to avoid downtime at all costs, PDM monitors the health status of the machine to anticipate failure.
+This aims to minimize both downtime and costs of repair.
+Traditionally, there are ways to predict the machine status through physical models or expert systems, but we will focus on data-driven approaches (i.e. deep neural networks).</p>
+<p>Most times, the data used for PDM are multivariate time series.
+The channels of the series constitute of sensor readings during operation (e.g. vibration or temperature) or test readings done at specific time intervals.
+Label information is mostly provided as one label for each series.
+Naturally, PDM data is imbalanced in favor of data from healthy, normally running machines.
+Data from failing machines is much rarer, as failures should be the exception, not the norm.
+Benchmark datasets often contain several subsets, where the machine is the same but working conditions (e.g. load on an engine) are different.
+This makes it possible to test models against domain shift.</p>
+<p>Broadly, we can divide PDM tasks into two categories based on when to predict, relative to the point of failure.
+<em>Diagnostics</em> aims to predict if the system is running normally or if a fault is present.
+This is normally framed as a classification problem with <em>n+1</em> classes, one for the normal state and one for each fault.
+<em>Prognostics</em>, on the other hand, tries to predict when the point of failure will occur in the future.
+This family of tasks is much harder as we have to detect an upcoming failure before it even occurs.
+Obviously, prognostics is limited to degradation type failures, e.g. wear on a bearing. It would be impossible to predict sudden-onset failures like a goose flying into a jet engine.</p>
+<figure>
+<img src=/img/feat_rul.png alt="A plot of the sensor 10 and the RUL over time for one time series. The RUL is linearly decreasing, while the sensor readings are increasing non-linearly.">
+<figcaption>
+<em>
+<b>Readings of sensor 10 and RUL of the first time series in subset FD001 of the NASA C-MAPSS dataset:</b>
+We can see that the RUL is a simple linear function of time.
+The sensor readings behave non-linear and are afflicted with noise.
+</em>
+</figcaption>
+</figure>
+<p>Prognostics problems, the ones I care about, are often framed as regression tasks, where we predict the remaining number of equally long operation cycles until the machine breaks.
+This is called remaining useful lifetime (RUL) estimation.
+While there are several approaches to do RUL estimation, we will focus on the most direct approach, where we use a DNN to predict the RUL.
+For all math fetishists out there, we try to model $P(RUL|X)$ with a function $f_\Theta(x_t)=\operatorname{rul}_t$ where $f_\Theta$ is a neural network parametrized by the weight vector $\Theta$, $x_t$ is a multivariate time series until time step $t$ and $rul_t$ the RUL at the same time step.</p>
+<h2 id=labeling-is-hard>Labeling is Hard<a hidden class=anchor aria-hidden=true href=#labeling-is-hard>#</a></h2>
+<p>As mentioned before, PDM data is highly imbalanced.
+The majority of the data is from healthy machines and only a few samples from failing machines are available.
+This leads to a lot of research effort toward trying to use the existing data more efficiently.</p>
+<p>RUL estimation has an additional problem.
+The data consists of time series of sensor readings from the last repair ($t=0$) to the point of failure ($t_{max}$).
+The label information here is the remaining lifetime at each step of the time series defined as $RUL(t) = t_{max} - t$.
+Obviously, we can only calculate the labels if $t_{max}$ is known, i.e. the machine failed.
+Considering that failure occurs only after significant time, we can see that we accumulate a lot of unlabeled data before we can assign a label.</p>
+<p>Abundant unlabeled data cries for <em>semi-supervised learning (SSL)</em> methods, so many approaches were tested in recent years.
+I found unsupervised pre-training with autoencoders, variational autoencoders, or restricted Boltzmann machines.
+The basic idea is to take your unlabeled data and use an unsupervised learning technique to get a feature extraction network.
+Then you add a regression network on top of it and fine-tune the whole thing on your labeled data.
+The main factor influencing performance here is the amount of available labeled data, so the approaches are tested by using different percentages of the dataset as labeled and the rest as unlabeled.
+Up until now, reported performance improvements are minimal.</p>
+<p>Others took it one step further and used <em>unsupervised domain adaption (UDA)</em> methods.
+Unsupervised domain adaption can be seen as a generalization of SSL where the labeled and unlabeled data don&rsquo;t need to be from the same generating distribution.
+Researchers adopted approaches using adversarial and maximum mean discrepancy metrics that were popularized in the computer vision space.
+The setup here is to take one subset of your data (divided by working conditions) as labeled and the other as unlabeled.
+The aim is to minimize the prediction error on the unlabeled data.
+Performance improvements for these methods are pretty significant, although the performance is still outside the range of where one would consider it for productive use.</p>
+<h2 id=why-all-of-this-doesnt-matter>Why All of This Doesn&rsquo;t Matter<a hidden class=anchor aria-hidden=true href=#why-all-of-this-doesnt-matter>#</a></h2>
+<p>Okay, we take established methods from other fields, apply them to ours and get results that are somewhere between negligible and decent.
+So far, so good.
+The problem is that none of these results are meaningful at all, because the experimental design was adopted alongside the methods without thinking it through.
+The offending design choice lies in how the datasets were prepared for these experiments.</p>
+<p>There is no RUL estimation benchmark dataset, so researchers made do with adapting existing ones.
+They took a dataset of labeled time series and partitioned it into a labeled and an unlabeled portion.
+For the unlabeled portion, they simply discarded the existing labels.
+If this had been an image dataset, it would be fine, but remember how labels are calculated for RUL estimation.
+The only thing you need is the time of failure $t_{max}$, and you can label each time step in the series.
+This means considering any of the time series in our data unlabeled as-is would be highly unrealistic.
+They can all be labeled trivially.
+The only reason any time series in our data would be unlabeled is if it did not contain the point of failure.
+The logical design choice would, therefore, be to discard part of the time series alongside the label, starting at the end of the series.</p>
+<figure>
+<img src=/img/sensor10.png alt="A plot of the distribution of a sensor value in the dataset. You can see that the distribution of labeled data is different from the unlabeled data.">
+<figcaption>
+Distribution of sensor 10 in subset FD001 of the NASA C-MAPSS dataset:
+Half of the time series is assumed to be labeled (blue) and the other half unlabeled (green, orange).
+We can see how the feature distribution is shifted for the unlabeled data if only 80% (orange) of the first time steps are available or 60% (green).
+</figcaption>
+</figure>
+<p>This makes the problem fascinating to work on because it invalidates some assumptions of semi-supervised learning and unsupervised-domain adaption.
+The figure above shows how the discarded failure data impacts the distribution of an exemplary feature.
+The distribution shift seems worse going from 100% to 80% than going from 80% to 60%.
+This trend is consistent when reducing the data even further and underlines the importance of near failure data for capturing the whole feature distribution.</p>
+<p>SSL assumes that the labeled and unlabeled data comes from the same generating distribution.
+Without data from the failure points, the unlabeled data comes from a truncated version of the generating distribution, which may affect training.
+An autoencoder used for unsupervised pre-training, for example, would focus more on learning the healthy state because it is now even more abundant in the data.
+This, in turn, leads to worse representations for the failure state.</p>
+<p>UDA frees itself from the assumption of matching distributions but still suffers all the same.
+The UDA methods used up until now are all feature-based, meaning that they try to match the distributions of extracted features from labeled and unlabeled data.
+The problem here is that we do not only have a distribution shift between labeled and unlabeled data but between training and test data, too, as the test set will contain data near the failure point.
+In the most extreme case, where we discard a lot of the unlabeled time series, this may lead to a worse performance compared to not using the unlabeled data at all.
+This is also known as negative transfer.</p>
+<p>That UDA methods suffer under these conditions was already shown on the NASA C-MAPSS dataset, a popular RUL estimation benchmark (<a href=https://doi.org/10.1109/ICPHM49022.2020.9187058>Link</a>).
+This is a shameless plug, because it&rsquo;s, obviously, my own work.
+We can see in this paper how the performance of the two investigated UDA algorithms degrades with fewer data near failure.
+If you don&rsquo;t have access to IEEE Xplore and want a copy of the paper, just shoot me a message.</p>
+<h2 id=lessons-learned>Lessons Learned<a hidden class=anchor aria-hidden=true href=#lessons-learned>#</a></h2>
+<p>We now see, that the experimental design used for SSL and UDA probably overestimates the test performance, but the fix is relatively simple.
+Instead of discarding only the label, we discard parts of the unlabeled time series, too.
+This leads to the question of how much of the time series we can discard or in other words, how far out from failure can a machine be to be useful to our method.
+The holy grail would be a method that can even draw knowledge from healthy machines alone, but even a method that can use data from machines halfway to failure would be a huge improvement.</p>
+<p>On a more general note, we have seen how a whole line of research (albeit a young one) can fall into the trap of blindly copying state-of-the-art methods.
+As ML practitioners we should definitely draw inspiration and best practices from other fields, but it is no replacement for understanding your data and how your model will be used.
+There is no need to reinvent the wheel, but you should be certain that a wheel is what you need.</p>
+<p>The insights in this post may be mundane and in the end pretty obvious.
+But you know what they say: in the country of the blindly copying, the one-eyed is king.</p>
+</div>
+<footer class=post-footer>
+<ul class=post-tags>
+<li><a href=https://krokotsch.eu/tags/research/>research</a></li>
+</ul>
+</footer>
+</article>
+</main>
+<footer class=footer>
+<span>&copy; 2022 <a href=https://krokotsch.eu/>Don't Repeat Yourself</a></span>
+<span>
+Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a>
+</span>
+</footer>
+<a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><style>#cookie-notice{padding:1.5rem 1rem;display:none;text-align:center;position:fixed;bottom:0;width:calc(100% - 2rem);background:#222;color:rgba(255,255,255,.8)}#cookie-notice a{display:inline-block;cursor:pointer;margin-left:.5rem}@media(max-width:767px){#cookie-notice span{display:block;padding-top:3px;margin-bottom:1rem}#cookie-notice a{position:relative;bottom:4px}}</style>
+<div id=cookie-notice><span>I am using third-party cookies to count readers. If you don't want to be counted, please use incognito mode.</span><a id=cookie-notice-accept class="btn btn-primary btn-sm">OK</a><a href=/privacy class="btn btn-primary btn-sm">More info</a></div>
+<script>var clicky_site_ids,s;function createCookie(d,e,b){var c="",a;b&&(a=new Date,a.setTime(a.getTime()+b*24*60*60*1e3),c="; expires="+a.toUTCString()),document.cookie=d+"="+e+c+"; path=/"}function readCookie(e){for(var c=e+"=",d=document.cookie.split(';'),b=0,a;b<d.length;b++){for(a=d[b];a.charAt(0)==' ';)a=a.substring(1,a.length);if(a.indexOf(c)==0)return a.substring(c.length,a.length)}return null}function eraseCookie(a){createCookie(a,"",-1)}readCookie('cookie-notice-dismissed')=='true'?(clicky_site_ids=clicky_site_ids||[],clicky_site_ids.push(101271854),s=document.createElement('script'),s.src="https://static.getclicky.com/js",document.head.appendChild(s)):document.getElementById('cookie-notice').style.display='block',document.getElementById('cookie-notice-accept').addEventListener("click",function(){createCookie('cookie-notice-dismissed','true',31),document.getElementById('cookie-notice').style.display='none',location.reload()})</script>
+<script>let menu=document.getElementById('menu');menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener("click",function(b){b.preventDefault();var a=this.getAttribute("href").substr(1);window.matchMedia('(prefers-reduced-motion: reduce)').matches?document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView({behavior:"smooth"}),a==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${a}`)})})</script>
+<script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script>
+<script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove('dark'),localStorage.setItem("pref-theme",'light')):(document.body.classList.add('dark'),localStorage.setItem("pref-theme",'dark'))})</script>
+</body>
+</html>
