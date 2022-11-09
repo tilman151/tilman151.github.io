@@ -1,535 +1,388 @@
-<!doctype html><html lang=en dir=auto>
-<head><meta charset=utf-8>
-<meta http-equiv=x-ua-compatible content="IE=edge">
-<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
-<meta name=robots content="index, follow">
-<title>Make DL4J Readable Again | Don't Repeat Yourself</title>
-<meta name=keywords content="cleancode">
-<meta name=description content="A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea.">
-<meta name=author content>
-<link rel=canonical href=https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/>
-<link crossorigin=anonymous href=/assets/css/stylesheet.min.d96b26af08d2675aeb380036e8e050174335af01efa27b67dbf48b2f6d9b35d7.css integrity="sha256-2WsmrwjSZ1rrOAA26OBQF0M1rwHvontn2/SLL22bNdc=" rel="preload stylesheet" as=style>
-<script defer crossorigin=anonymous src=/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5+kdJvBz5iKbt6B5PJI=" onload=hljs.initHighlightingOnLoad()></script>
-<link rel=icon href=https://tilman151.github.io/img/favicon.ico>
-<link rel=icon type=image/png sizes=16x16 href=https://tilman151.github.io/img/favicon-16x16.png>
-<link rel=icon type=image/png sizes=32x32 href=https://tilman151.github.io/img/favicon-32x32.png>
-<link rel=apple-touch-icon href=https://tilman151.github.io/img/apple-touch-icon.png>
-<link rel=mask-icon href=https://tilman151.github.io/img/safari-pinned-tab.svg>
-<meta name=theme-color content="#2e2e33">
-<meta name=msapplication-TileColor content="#2e2e33">
-<meta name=generator content="Hugo 0.92.1">
-<noscript>
-<style>#theme-toggle,.top-link{display:none}</style>
-<style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--hljs-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style>
-</noscript><meta property="og:title" content="Make DL4J Readable Again">
-<meta property="og:description" content="A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/"><meta property="article:section" content="posts">
-<meta property="article:published_time" content="2020-09-20T00:00:00+00:00">
-<meta property="article:modified_time" content="2020-09-20T00:00:00+00:00">
-<meta name=twitter:card content="summary">
-<meta name=twitter:title content="Make DL4J Readable Again">
-<meta name=twitter:description content="A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea.">
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"https://tilman151.github.io/posts/"},{"@type":"ListItem","position":3,"name":"Make DL4J Readable Again","item":"https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/"}]}</script>
-<script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Make DL4J Readable Again","name":"Make DL4J Readable Again","description":"A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python\u0026rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea.","keywords":["cleancode"],"articleBody":"A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python’s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea. As I am a deep learning engineer, naturally I had a look at what DL frameworks Kotlin had to offer and arrived at DL4J. This is actually a Java framework, but as Kotlin is interoperable with Java, it can be used anyway. I had a look at some examples of how to build a network and found this (Source):\nval conf = NeuralNetConfiguration.Builder() .seed(rngSeed.toLong()) //include a random seed for reproducibility  // use stochastic gradient descent as an optimization algorithm  .activation(Activation.RELU) .weightInit(WeightInit.XAVIER) .updater(Nesterovs(rate, 0.98)) //specify the rate of change of the learning rate.  .l2(rate * 0.005) // regularize learning model  .list() .layer(DenseLayer.Builder() //create the first input layer.  .nIn(numRows * numColumns) .nOut(500) .build()) .layer(DenseLayer.Builder() //create the second input layer  .nIn(500) .nOut(100) .build()) .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) //create hidden layer  .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) .build() val model = MultiLayerNetwork(conf) model.init() Coming from Python and PyTorch, I just thought: “Damn, that’s not pretty!”. Maybe it’s just my bias because I think Java code is ugly as hell. On the other hand, Kotlin promised to reduce the verbosity that makes Java so hard to read, so maybe I could do something about this. At this point, my project began to take form. What if I could use the nice Kotlin techniques from the tutorial to make network declarations in DL4J more readable. I arrived at this:\nval conf = sequential { seed(rngSeed.toLong()) //include a random seed for reproducibility  // use stochastic gradient descent as an optimization algorithm  activation(Activation.RELU) weightInit(WeightInit.XAVIER) updater(Nesterovs(rate, 0.98)) //specify the rate of change of the learning rate.  l2(rate * 0.005) // regularize learning model  layers { dense { nIn(numRows * numColumns) nOut(500) } dense { nIn(500) nOut(100) } output { lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) activation(Activation.SOFTMAX) nIn(100) nOut(outputNum) } } } val model = MultiLayerNetwork(conf) model.init() This code snippet defines exactly the same network as the one before but omits all the syntactic clutter. No more dots before the function calls because we don’t have to hide a gigantic one-liner anymore. No more calling layer each time when adding a new layer. No more creating a Builder object for each layer. No more calling build after each layer configuration. In my opinion, this is a definite improvement over the Java version and much more readable.\nHow did I do this? With the Domain-Specific Language (DSL) feature of Kotlin and much less code than I expected. The result is a small library named Klay (Kotlin LAYers) that can be used to define neural networks in DL4J.\nSo without further ado, let’s dive into what exactly DL4J does and how Klay makes it easier. You can find all the code shown here at github.com/tilman151/klay.\nHow DL4J Defines Neural Networks The API of DL4J reminded me of Keras a lot. It follows a define-and-run scheme which means that you first build a computation graph and then run it with your inputs. Coming from PyTorch, which uses a define-by-run scheme, this was something I had to adjust to again.\nEverything starts with the NeuralNetConfiguration class. Instances of this class, hold all the information we need to build the computation graph of our network. Creating a new NeuralNetConfiguration follows a builder pattern. We first create a NeuralNetConfiguration.Builder that provides member functions to set the properties of our configuration. Each of these functions, e.g. updater to set the weight updating algorithm, returns the Builder instance. This makes it easy to chain calls. When we are done, we call the build function to receive our configuration object:\nval conf = NeuralNetConfiguration.Builder() .seed(rngSeed.toLong()) .activation(Activation.RELU) .weightInit(WeightInit.XAVIER) .updater(Nesterovs(rate, 0.98)) .build() By calling a function like activation, we set the default value for all layers of the network. The example above uses ReLU activation and Xavier initialization for all layers if not specified otherwise in the layer itself.\nTo add layers to the network, we call the list function of the Builder object. This gives us a ListBuilder where we can add a layer by passing a layer configuration to its layer function:\nval conf = NeuralNetConfiguration.Builder() .list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) .build() Layer configurations follow the same pattern as the overall network. We create a Builder for the desired layer, call its configuration functions, and then build.\nThe last step is building a computation graph from our configuration. This can be done by simply instantiating a MultiLayerNetwork object:\nval model = MultiLayerNetwork(conf) model.init() We can train our network, by feeding batches from a DataSetIterator, e.g. MNIST:\nval mnistTrain = MnistDataSetIterator(batchSize, true, rngSeed) model.fit(mnistTrain, numEpochs) Now that we know how DL4J builds networks, let’s have a look at what Kotlin brings to the table.\nDomain-Specific Languages in Kotlin Kotlin brings a bunch of nice features with it and describing them all would break the scope of this article. Therefore, we will focus on the features that make defining Domain-Specific Languages (DSLs) in Kotlin so easy. DSL is quite a buzzword (memorize it if you want to impress your superiors), so to be clear, I am referring to the definition on the Kotlin website:\n Type-safe builders allow creating Kotlin-based domain-specific languages (DSLs) suitable for building complex hierarchical data structures in a semi-declarative way. Some of the example use cases for the builders are:\n Generating markup with Kotlin code, such as HTML or XML Programmatically laying out UI components: Anko Configuring routes for a web server: Ktor.   Using this definition, DL4J, in a way, already has a DSL for defining network structures, albeit an ugly one. Thus, we only need to wrap the existing language into a readable one. Because Kotlin is a JVM language and interoperable with Java, I will use Java instead of Python as a reference point in the following paragraphs. So here comes all my Java skill from the first semester.\nSkip this part if you know everything about higher-order functions, Lambda expressions, and extension functions.\nExtension Functions The first concept we need is extension functions. In Java, all of a class' member functions are defined inside it. If we want to add a member function, we would need to create a child class:\npublic class Base { protected int bar; public void foo(int bar) { this.bar = bar; } } // Adding a getter for bar  public class Child extends Base { public int getBar() { return super.bar; } } In Kotlin, we can instead use an extension function like this:\nfun Base.getBar() { return this.bar } The this keyword refers to the instance of the Base class we called the function on. We can write code exactly as if the extension function is a normal member of the class. Therefore, we can omit the this keyword, too:\nfun Base.getBar() { return bar } This way we can add functions and even properties to Java and Kotlin classes without inheriting or modifying them. Overloading functions is possible, too. The approach has an important advantage over sub-classing: we don’t have to substitute our usage of the class Base. All code that is working with Base at the moment will continue to do so and no casting is involved if we want to call our new function. We only need to import the extension function beforehand.\nHigher-Order Functions and Lambdas Higher-order functions are functions that take other functions as arguments. A Java example is the forEach function that applies a function to each element of an Iterable.\npublic class Arithmetic { public static inc(int n) { return ++n; } } // ...  ArrayListint numbers = new ArrayList(List.of(1, 2, 3)); ArrayListint incrementedNumbers = numbers.forEach(Arithmetic::inc); We pass a reference of the static method inc in the class Arithmetic to forEach and receive an ArrayList of incremented numbers. Now, this is a lot of code for defining the function forEach. Fortunately we have Lambda expression at our hands to make things easier for us:\nArrayListint incrementedNumbers = numbers.forEach({(n) - ++n}); We simply pass an anonymous function in the form of a Lambda expression to forEach and don’t have to bother with defining it elsewhere.\nIn Kotlin the process of using higher-order functions and Lambda expression is a little more streamlined. The forEach equivalent is called map, so our example looks like this:\nval numbers = listOf(1, 2, 3) val increasedNumbers = numbers.map({n - ++n}) In fact, Kotlin even lets us omit the parenthesis if the last argument of a function is a Lambda expression:\nval increasedNumbers = numbers.map {n - ++n} This way we got rid of all the syntactic clutter and receive code that is much more readable.\nBut, this is not where it ends. Even extension functions from the previous section can be Lambda expressions. This way, we can call members of an object inside the Lambda Expression with the this statement:\ndata class Person(val name: String) val persons = listOf(Person(\"Foo\"), Person(\"Bar\")) val getName: Person.() - String = {this.name} val names = persons.map(getName) We first assigned the Lambda to a variable to declare the function type. Let’s have a closer look. A Kotlin function type follows the scheme argument types - output type. Person.() means that the Lambda takes an instance of the class Person which is called the receiver. The function returns a String which is signalized by the right-hand side of the arrow.\nAnonymous extension functions are especially helpful for initializing objects with the higher-order function apply:\ndata class Person(val name: String, var age: Int = 0, var city: String = \"\") val p = Person(\"Foo\") p.apply { age = 25 city = \"Bar\" } The return type of the Lambda, that is passed to apply, is Unit which means it returns nothing (similar to Java’s void). The function apply simply returns the receiver object. Alternatively, we could use the run function, which returns the result of the last call in the Lambda:\nval p = Person(\"Foo\") print(p.run { age = 25 age }) With all that theory in our mind, let us see how all this leads to our neural network DSL.\nKlay for Defining Neural Networks Our little “library”, Klay, makes heavy use of higher-order functions, extension functions, and Lambdas with receivers. It is not much different from the example in the official Kotlin docs that builds HTML. Let’s have a look again at our DL4J example:\nval conf = NeuralNetConfiguration.Builder() .seed(rngSeed.toLong()) .activation(Activation.RELU) .weightInit(WeightInit.XAVIER) .updater(Nesterovs(rate, 0.98)) .l2(rate * 0.005) .list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) .layer(DenseLayer.Builder() .nIn(500) .nOut(100) .build()) .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) .build() As you probably remember, the first step of building a neural network in DL4J is creating a NeuralNetConfiguration.Builder. Using our knowledge about Lambdas with receivers, we can write the following function:\nfun sequential(init: NeuralNetConfiguration.Builder.() - NeuralNetConfiguration.ListBuilder): MultiLayerConfiguration { return NeuralNetConfiguration.Builder().run(init).build() } This function takes a Lambda, init, with a NeuralNetConfiguration.Builder receiver. The receiver object is created inside the sequential function. We call the higher-order function run on our receiver object and get a NeuralNetConfiguration.ListBuilder object which we then build into a MultiLayerConfiguration. Using this function would look like this:\nval conf = sequential( { this.seed(rngSeed.toLong()) this.activation(Activation.RELU) this.weightInit(WeightInit.XAVIER) this.updater(Nesterovs(rate, 0.98)) this.l2(rate * 0.005) this.list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) .layer(DenseLayer.Builder() .nIn(500) .nOut(100) .build()) .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) } ) Inside the init Lambda, we have access to all member functions of the Builder via this to configure defaults. Calling the list function, we can add layers the conventional way. list and each call of layer return a NeuralNetConfiguration.ListBuilder object. As layer is the last function call in the Lambda expression, its resulting Builder is returned to sequential to be built there.\nNext, we want to get rid of the call to list. We will define an extension function of NeuralNetConfiguration.Builder like this:\nfun NeuralNetConfiguration.Builder.layers(init: NeuralNetConfiguration.ListBuilder.() - Unit): NeuralNetConfiguration.ListBuilder { return this.list().apply(init) } Inside the function, we call list and use the higher-order function apply to execute our Lambda expression init on it. This simplifies our example like this:\nval conf = sequential( { this.seed(rngSeed.toLong()) this.activation(Activation.RELU) this.weightInit(WeightInit.XAVIER) this.updater(Nesterovs(rate, 0.98)) this.l2(rate * 0.005) this.layers( { layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) layer(DenseLayer.Builder() .nIn(500) .nOut(100) .build()) layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) } ) } ) apply returns the ListBuilder created by list. Therefore, our function can be used as a drop-in replacement.\nThe last offending code is the call of the layer function for adding each layer to the network. We can simply outsource the call, and the creation of the layer’s Builder to an extension function of the ListBuilder. For the DenseLayer and OutputLayer, the functions looks like this:\nfun NeuralNetConfiguration.ListBuilder.dense(init: DenseLayer.Builder.() - Unit) { this.layer(DenseLayer.Builder().apply(init).build()) } fun NeuralNetConfiguration.ListBuilder.output(init: OutputLayer.Builder.() - Unit) { this.layer(OutputLayer.Builder().apply(init).build()) } The Lambda expression with the layer’s Builder as the receiver lets us again conveniently configure the layer. Our example has now completely transformed:\nval conf = sequential( { this.seed(rngSeed.toLong()) this.activation(Activation.RELU) this.weightInit(WeightInit.XAVIER) this.updater(Nesterovs(rate, 0.98)) this.l2(rate * 0.005) this.layers( { this.dense( { this.nIn(numRows * numColumns) this.nOut(500) } ) this.dense( { this.nIn(500) this.nOut(100) } ) this.output( { this.lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) this.activation(Activation.SOFTMAX) this.nIn(100) this.nOut(outputNum) } ) } ) } ) But wait, this isn’t even its final form. Now we have to apply all of Kotlin’s syntactic sugar, i.e. removing this and the parenthesis, et voila:\nval conf = sequential { seed(rngSeed.toLong()) activation(Activation.RELU) weightInit(WeightInit.XAVIER) updater(Nesterovs(rate, 0.98)) l2(rate * 0.005) layers { dense { nIn(numRows * numColumns) nOut(500) } dense { nIn(500) nOut(100) } output { lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) activation(Activation.SOFTMAX) nIn(100) nOut(outputNum) } } } We are done. All this with only four new functions. Extending our little library for new layers now only takes one function each.\nAnother point where Klay shines is procedurally generating network layer declarations. A common example would be to add several dense layers with an increasing number of units to our network with a loop. In standard DL4J it would look like this:\nval units = listOf(100, 200, 300, 400) val unfinished = NeuralNetConfiguration.Builder() .activation(Activation.RELU) .updater(Nesterovs(rate, 0.98)) .list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(units[0]) .build()) for (u in units.zipWithNext()) { unfinished.layer(DenseLayer.Builder() .nIn(u.first) .nOut(u.second) .build()) } val conf = unfinished.layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) .build() As we can see, we have to break our declaration flow to insert the loop. This makes the code much uglier than before. Let’s see the Klay declaration on the other hand:\nval units = listOf(100, 200, 300, 400) val config = sequential { activation(Activation.RELU) updater(Nesterovs(rate, 0.98)) layers { dense { nIn(numRows * numColumns) nOut(units[0]) } for (u in units.zipWithNext()) { dense { nIn(u.first) nOut(u.second) } } output { lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) activation(Activation.SOFTMAX) nIn(units.last()) nOut(outputNum) } } } The loop integrates nicely with the rest of the declaration, and we do not break the flow. The point is, this is not some gimmick I added in the background. This is out of the box functionality in Kotlin. We can use the full power of the programming language while staying true to our DSL.\nIs Klay ready to use? Yes, it is! Even though it took so few lines of code that it does not really warrant calling it a library, you can find it here. All code is provided as-is, yadda, yadda, yadda.\nCurrently, the library supports all operations needed to recreate the quickstart examples of DL4J. They are included in the project repository. Converting them from Java to Kotlin was, fortunately, extremely easy thanks to IntelliJ IDEA’s automatic conversion function. If you are missing something and want to help out, feel free to send me a pull request.\nConclusion I liked working with Kotlin for a change and maybe I will expand Klay’s coverage of DL4J later on. On the other hand, I noticed that I am not as fluent in Kotlin as in Python which let me struggle a bit with this project.\nIf you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out my question on StackOverflow related to this article. I was not able to make the layer building functions generic and would appreciate some input. You would really help me out there.\n","wordCount":"2702","inLanguage":"en","datePublished":"2020-09-20T00:00:00Z","dateModified":"2020-09-20T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/"},"publisher":{"@type":"Organization","name":"Don't Repeat Yourself","logo":{"@type":"ImageObject","url":"https://tilman151.github.io/img/favicon.ico"}}}</script>
-</head>
-<body id=top>
-<script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add('dark'):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove('dark'):window.matchMedia('(prefers-color-scheme: dark)').matches&&document.body.classList.add('dark')</script>
-<header class=header>
-<nav class=nav>
-<div class=logo>
-<a href=https://tilman151.github.io accesskey=h title="Don't Repeat Yourself (Alt + H)">Don't Repeat Yourself</a>
-<span class=logo-switches>
-<button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-</button>
-</span>
-</div>
-<ul id=menu>
-<li>
-<a href=https://tilman151.github.io/publications/ title=Publications>
-<span>Publications</span>
-</a>
-</li>
-</ul>
-</nav>
-</header>
-<main class=main>
-<article class=post-single>
-<header class=post-header>
-<h1 class=post-title>
-Make DL4J Readable Again
-</h1>
-<div class=post-meta><span title="2020-09-20 00:00:00 +0000 UTC">20 September 2020</span>&nbsp;·&nbsp;13 min
-</div>
-</header>
-<div class=post-content><p>A while ago, I stumbled upon an <a href=https://blog.jetbrains.com/kotlin/2019/12/making-kotlin-ready-for-data-science/>article</a> about the language Kotlin and how to use it for Data Science.
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Make DL4J Readable Again | Don't Repeat Yourself</title><meta name=keywords content="cleancode"><meta name=description content="A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea."><meta name=author content><link rel=canonical href=https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/><link crossorigin=anonymous href=/assets/css/stylesheet.min.d96b26af08d2675aeb380036e8e050174335af01efa27b67dbf48b2f6d9b35d7.css integrity="sha256-2WsmrwjSZ1rrOAA26OBQF0M1rwHvontn2/SLL22bNdc=" rel="preload stylesheet" as=style><script defer crossorigin=anonymous src=/assets/js/highlight.min.b95bacdc39e37a332a9f883b1e78be4abc1fdca2bc1f2641f55e3cd3dabd4d61.js integrity="sha256-uVus3DnjejMqn4g7Hni+Srwf3KK8HyZB9V4809q9TWE=" onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=https://tilman151.github.io/img/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://tilman151.github.io/img/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://tilman151.github.io/img/favicon-32x32.png><link rel=apple-touch-icon href=https://tilman151.github.io/img/apple-touch-icon.png><link rel=mask-icon href=https://tilman151.github.io/img/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><meta name=generator content="Hugo 0.105.0"><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--hljs-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:title" content="Make DL4J Readable Again"><meta property="og:description" content="A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea."><meta property="og:type" content="article"><meta property="og:url" content="https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2020-09-20T00:00:00+00:00"><meta property="article:modified_time" content="2020-09-20T00:00:00+00:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="Make DL4J Readable Again"><meta name=twitter:description content="A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":2,"name":"Posts","item":"https://tilman151.github.io/posts/"},{"@type":"ListItem","position":3,"name":"Make DL4J Readable Again","item":"https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Make DL4J Readable Again","name":"Make DL4J Readable Again","description":"A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python\u0026rsquo;s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea.","keywords":["cleancode"],"articleBody":"A while ago, I stumbled upon an article about the language Kotlin and how to use it for Data Science. I found it interesting, as some of Python’s quirks were starting to bother me and I wanted to try something new. A day later, I had completed the Kotlin tutorials using Kotlin Koans in IntelliJ IDEA (which is an excellent way to get started with Kotlin). Hungry to test out my new language skills, I looked around for a project idea. As I am a deep learning engineer, naturally I had a look at what DL frameworks Kotlin had to offer and arrived at DL4J. This is actually a Java framework, but as Kotlin is interoperable with Java, it can be used anyway. I had a look at some examples of how to build a network and found this (Source):\nval conf = NeuralNetConfiguration.Builder() .seed(rngSeed.toLong()) //include a random seed for reproducibility // use stochastic gradient descent as an optimization algorithm .activation(Activation.RELU) .weightInit(WeightInit.XAVIER) .updater(Nesterovs(rate, 0.98)) //specify the rate of change of the learning rate. .l2(rate * 0.005) // regularize learning model .list() .layer(DenseLayer.Builder() //create the first input layer. .nIn(numRows * numColumns) .nOut(500) .build()) .layer(DenseLayer.Builder() //create the second input layer .nIn(500) .nOut(100) .build()) .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) //create hidden layer .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) .build() val model = MultiLayerNetwork(conf) model.init() Coming from Python and PyTorch, I just thought: “Damn, that’s not pretty!”. Maybe it’s just my bias because I think Java code is ugly as hell. On the other hand, Kotlin promised to reduce the verbosity that makes Java so hard to read, so maybe I could do something about this. At this point, my project began to take form. What if I could use the nice Kotlin techniques from the tutorial to make network declarations in DL4J more readable. I arrived at this:\nval conf = sequential { seed(rngSeed.toLong()) //include a random seed for reproducibility // use stochastic gradient descent as an optimization algorithm activation(Activation.RELU) weightInit(WeightInit.XAVIER) updater(Nesterovs(rate, 0.98)) //specify the rate of change of the learning rate. l2(rate * 0.005) // regularize learning model layers { dense { nIn(numRows * numColumns) nOut(500) } dense { nIn(500) nOut(100) } output { lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) activation(Activation.SOFTMAX) nIn(100) nOut(outputNum) } } } val model = MultiLayerNetwork(conf) model.init() This code snippet defines exactly the same network as the one before but omits all the syntactic clutter. No more dots before the function calls because we don’t have to hide a gigantic one-liner anymore. No more calling layer each time when adding a new layer. No more creating a Builder object for each layer. No more calling build after each layer configuration. In my opinion, this is a definite improvement over the Java version and much more readable.\nHow did I do this? With the Domain-Specific Language (DSL) feature of Kotlin and much less code than I expected. The result is a small library named Klay (Kotlin LAYers) that can be used to define neural networks in DL4J.\nSo without further ado, let’s dive into what exactly DL4J does and how Klay makes it easier. You can find all the code shown here at github.com/tilman151/klay.\nHow DL4J Defines Neural Networks The API of DL4J reminded me of Keras a lot. It follows a define-and-run scheme which means that you first build a computation graph and then run it with your inputs. Coming from PyTorch, which uses a define-by-run scheme, this was something I had to adjust to again.\nEverything starts with the NeuralNetConfiguration class. Instances of this class, hold all the information we need to build the computation graph of our network. Creating a new NeuralNetConfiguration follows a builder pattern. We first create a NeuralNetConfiguration.Builder that provides member functions to set the properties of our configuration. Each of these functions, e.g. updater to set the weight updating algorithm, returns the Builder instance. This makes it easy to chain calls. When we are done, we call the build function to receive our configuration object:\nval conf = NeuralNetConfiguration.Builder() .seed(rngSeed.toLong()) .activation(Activation.RELU) .weightInit(WeightInit.XAVIER) .updater(Nesterovs(rate, 0.98)) .build() By calling a function like activation, we set the default value for all layers of the network. The example above uses ReLU activation and Xavier initialization for all layers if not specified otherwise in the layer itself.\nTo add layers to the network, we call the list function of the Builder object. This gives us a ListBuilder where we can add a layer by passing a layer configuration to its layer function:\nval conf = NeuralNetConfiguration.Builder() .list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) .build() Layer configurations follow the same pattern as the overall network. We create a Builder for the desired layer, call its configuration functions, and then build.\nThe last step is building a computation graph from our configuration. This can be done by simply instantiating a MultiLayerNetwork object:\nval model = MultiLayerNetwork(conf) model.init() We can train our network, by feeding batches from a DataSetIterator, e.g. MNIST:\nval mnistTrain = MnistDataSetIterator(batchSize, true, rngSeed) model.fit(mnistTrain, numEpochs) Now that we know how DL4J builds networks, let’s have a look at what Kotlin brings to the table.\nDomain-Specific Languages in Kotlin Kotlin brings a bunch of nice features with it and describing them all would break the scope of this article. Therefore, we will focus on the features that make defining Domain-Specific Languages (DSLs) in Kotlin so easy. DSL is quite a buzzword (memorize it if you want to impress your superiors), so to be clear, I am referring to the definition on the Kotlin website:\nType-safe builders allow creating Kotlin-based domain-specific languages (DSLs) suitable for building complex hierarchical data structures in a semi-declarative way. Some of the example use cases for the builders are:\nGenerating markup with Kotlin code, such as HTML or XML Programmatically laying out UI components: Anko Configuring routes for a web server: Ktor. Using this definition, DL4J, in a way, already has a DSL for defining network structures, albeit an ugly one. Thus, we only need to wrap the existing language into a readable one. Because Kotlin is a JVM language and interoperable with Java, I will use Java instead of Python as a reference point in the following paragraphs. So here comes all my Java skill from the first semester.\nSkip this part if you know everything about higher-order functions, Lambda expressions, and extension functions.\nExtension Functions The first concept we need is extension functions. In Java, all of a class’ member functions are defined inside it. If we want to add a member function, we would need to create a child class:\npublic class Base { protected int bar; public void foo(int bar) { this.bar = bar; } } // Adding a getter for bar public class Child extends Base { public int getBar() { return super.bar; } } In Kotlin, we can instead use an extension function like this:\nfun Base.getBar() { return this.bar } The this keyword refers to the instance of the Base class we called the function on. We can write code exactly as if the extension function is a normal member of the class. Therefore, we can omit the this keyword, too:\nfun Base.getBar() { return bar } This way we can add functions and even properties to Java and Kotlin classes without inheriting or modifying them. Overloading functions is possible, too. The approach has an important advantage over sub-classing: we don’t have to substitute our usage of the class Base. All code that is working with Base at the moment will continue to do so and no casting is involved if we want to call our new function. We only need to import the extension function beforehand.\nHigher-Order Functions and Lambdas Higher-order functions are functions that take other functions as arguments. A Java example is the forEach function that applies a function to each element of an Iterable.\npublic class Arithmetic { public static inc(int n) { return ++n; } } // ... ArrayList\u003cint\u003e numbers = new ArrayList\u003c\u003e(List.of(1, 2, 3)); ArrayList\u003cint\u003e incrementedNumbers = numbers.forEach(Arithmetic::inc); We pass a reference of the static method inc in the class Arithmetic to forEach and receive an ArrayList of incremented numbers. Now, this is a lot of code for defining the function forEach. Fortunately we have Lambda expression at our hands to make things easier for us:\nArrayList\u003cint\u003e incrementedNumbers = numbers.forEach({(n) -\u003e ++n}); We simply pass an anonymous function in the form of a Lambda expression to forEach and don’t have to bother with defining it elsewhere.\nIn Kotlin the process of using higher-order functions and Lambda expression is a little more streamlined. The forEach equivalent is called map, so our example looks like this:\nval numbers = listOf(1, 2, 3) val increasedNumbers = numbers.map({n -\u003e ++n}) In fact, Kotlin even lets us omit the parenthesis if the last argument of a function is a Lambda expression:\nval increasedNumbers = numbers.map {n -\u003e ++n} This way we got rid of all the syntactic clutter and receive code that is much more readable.\nBut, this is not where it ends. Even extension functions from the previous section can be Lambda expressions. This way, we can call members of an object inside the Lambda Expression with the this statement:\ndata class Person(val name: String) val persons = listOf(Person(\"Foo\"), Person(\"Bar\")) val getName: Person.() -\u003e String = {this.name} val names = persons.map(getName) We first assigned the Lambda to a variable to declare the function type. Let’s have a closer look. A Kotlin function type follows the scheme argument types -\u003e output type. Person.() means that the Lambda takes an instance of the class Person which is called the receiver. The function returns a String which is signalized by the right-hand side of the arrow.\nAnonymous extension functions are especially helpful for initializing objects with the higher-order function apply:\ndata class Person(val name: String, var age: Int = 0, var city: String = \"\") val p = Person(\"Foo\") p.apply { age = 25 city = \"Bar\" } The return type of the Lambda, that is passed to apply, is Unit which means it returns nothing (similar to Java’s void). The function apply simply returns the receiver object. Alternatively, we could use the run function, which returns the result of the last call in the Lambda:\nval p = Person(\"Foo\") print(p.run { age = 25 age }) With all that theory in our mind, let us see how all this leads to our neural network DSL.\nKlay for Defining Neural Networks Our little “library”, Klay, makes heavy use of higher-order functions, extension functions, and Lambdas with receivers. It is not much different from the example in the official Kotlin docs that builds HTML. Let’s have a look again at our DL4J example:\nval conf = NeuralNetConfiguration.Builder() .seed(rngSeed.toLong()) .activation(Activation.RELU) .weightInit(WeightInit.XAVIER) .updater(Nesterovs(rate, 0.98)) .l2(rate * 0.005) .list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) .layer(DenseLayer.Builder() .nIn(500) .nOut(100) .build()) .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) .build() As you probably remember, the first step of building a neural network in DL4J is creating a NeuralNetConfiguration.Builder. Using our knowledge about Lambdas with receivers, we can write the following function:\nfun sequential(init: NeuralNetConfiguration.Builder.() -\u003e NeuralNetConfiguration.ListBuilder): MultiLayerConfiguration { return NeuralNetConfiguration.Builder().run(init).build() } This function takes a Lambda, init, with a NeuralNetConfiguration.Builder receiver. The receiver object is created inside the sequential function. We call the higher-order function run on our receiver object and get a NeuralNetConfiguration.ListBuilder object which we then build into a MultiLayerConfiguration. Using this function would look like this:\nval conf = sequential( { this.seed(rngSeed.toLong()) this.activation(Activation.RELU) this.weightInit(WeightInit.XAVIER) this.updater(Nesterovs(rate, 0.98)) this.l2(rate * 0.005) this.list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) .layer(DenseLayer.Builder() .nIn(500) .nOut(100) .build()) .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) } ) Inside the init Lambda, we have access to all member functions of the Builder via this to configure defaults. Calling the list function, we can add layers the conventional way. list and each call of layer return a NeuralNetConfiguration.ListBuilder object. As layer is the last function call in the Lambda expression, its resulting Builder is returned to sequential to be built there.\nNext, we want to get rid of the call to list. We will define an extension function of NeuralNetConfiguration.Builder like this:\nfun NeuralNetConfiguration.Builder.layers(init: NeuralNetConfiguration.ListBuilder.() -\u003e Unit): NeuralNetConfiguration.ListBuilder { return this.list().apply(init) } Inside the function, we call list and use the higher-order function apply to execute our Lambda expression init on it. This simplifies our example like this:\nval conf = sequential( { this.seed(rngSeed.toLong()) this.activation(Activation.RELU) this.weightInit(WeightInit.XAVIER) this.updater(Nesterovs(rate, 0.98)) this.l2(rate * 0.005) this.layers( { layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(500) .build()) layer(DenseLayer.Builder() .nIn(500) .nOut(100) .build()) layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) } ) } ) apply returns the ListBuilder created by list. Therefore, our function can be used as a drop-in replacement.\nThe last offending code is the call of the layer function for adding each layer to the network. We can simply outsource the call, and the creation of the layer’s Builder to an extension function of the ListBuilder. For the DenseLayer and OutputLayer, the functions looks like this:\nfun NeuralNetConfiguration.ListBuilder.dense(init: DenseLayer.Builder.() -\u003e Unit) { this.layer(DenseLayer.Builder().apply(init).build()) } fun NeuralNetConfiguration.ListBuilder.output(init: OutputLayer.Builder.() -\u003e Unit) { this.layer(OutputLayer.Builder().apply(init).build()) } The Lambda expression with the layer’s Builder as the receiver lets us again conveniently configure the layer. Our example has now completely transformed:\nval conf = sequential( { this.seed(rngSeed.toLong()) this.activation(Activation.RELU) this.weightInit(WeightInit.XAVIER) this.updater(Nesterovs(rate, 0.98)) this.l2(rate * 0.005) this.layers( { this.dense( { this.nIn(numRows * numColumns) this.nOut(500) } ) this.dense( { this.nIn(500) this.nOut(100) } ) this.output( { this.lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) this.activation(Activation.SOFTMAX) this.nIn(100) this.nOut(outputNum) } ) } ) } ) But wait, this isn’t even its final form. Now we have to apply all of Kotlin’s syntactic sugar, i.e. removing this and the parenthesis, et voila:\nval conf = sequential { seed(rngSeed.toLong()) activation(Activation.RELU) weightInit(WeightInit.XAVIER) updater(Nesterovs(rate, 0.98)) l2(rate * 0.005) layers { dense { nIn(numRows * numColumns) nOut(500) } dense { nIn(500) nOut(100) } output { lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) activation(Activation.SOFTMAX) nIn(100) nOut(outputNum) } } } We are done. All this with only four new functions. Extending our little library for new layers now only takes one function each.\nAnother point where Klay shines is procedurally generating network layer declarations. A common example would be to add several dense layers with an increasing number of units to our network with a loop. In standard DL4J it would look like this:\nval units = listOf(100, 200, 300, 400) val unfinished = NeuralNetConfiguration.Builder() .activation(Activation.RELU) .updater(Nesterovs(rate, 0.98)) .list() .layer(DenseLayer.Builder() .nIn(numRows * numColumns) .nOut(units[0]) .build()) for (u in units.zipWithNext()) { unfinished.layer(DenseLayer.Builder() .nIn(u.first) .nOut(u.second) .build()) } val conf = unfinished.layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) .activation(Activation.SOFTMAX) .nIn(100) .nOut(outputNum) .build()) .build() As we can see, we have to break our declaration flow to insert the loop. This makes the code much uglier than before. Let’s see the Klay declaration on the other hand:\nval units = listOf(100, 200, 300, 400) val config = sequential { activation(Activation.RELU) updater(Nesterovs(rate, 0.98)) layers { dense { nIn(numRows * numColumns) nOut(units[0]) } for (u in units.zipWithNext()) { dense { nIn(u.first) nOut(u.second) } } output { lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD) activation(Activation.SOFTMAX) nIn(units.last()) nOut(outputNum) } } } The loop integrates nicely with the rest of the declaration, and we do not break the flow. The point is, this is not some gimmick I added in the background. This is out of the box functionality in Kotlin. We can use the full power of the programming language while staying true to our DSL.\nIs Klay ready to use? Yes, it is! Even though it took so few lines of code that it does not really warrant calling it a library, you can find it here. All code is provided as-is, yadda, yadda, yadda.\nCurrently, the library supports all operations needed to recreate the quickstart examples of DL4J. They are included in the project repository. Converting them from Java to Kotlin was, fortunately, extremely easy thanks to IntelliJ IDEA’s automatic conversion function. If you are missing something and want to help out, feel free to send me a pull request.\nConclusion I liked working with Kotlin for a change and maybe I will expand Klay’s coverage of DL4J later on. On the other hand, I noticed that I am not as fluent in Kotlin as in Python which let me struggle a bit with this project.\nIf you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out my question on StackOverflow related to this article. I was not able to make the layer building functions generic and would appreciate some input. You would really help me out there.\n","wordCount":"2702","inLanguage":"en","datePublished":"2020-09-20T00:00:00Z","dateModified":"2020-09-20T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://tilman151.github.io/posts/kotlin-dsl-for-dl4j/"},"publisher":{"@type":"Organization","name":"Don't Repeat Yourself","logo":{"@type":"ImageObject","url":"https://tilman151.github.io/img/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://tilman151.github.io accesskey=h title="Don't Repeat Yourself (Alt + H)">Don't Repeat Yourself</a>
+<span class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></span></div><ul id=menu><li><a href=https://tilman151.github.io/publications/ title=Publications><span>Publications</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class=post-title>Make DL4J Readable Again</h1><div class=post-meta><span title='2020-09-20 00:00:00 +0000 UTC'>20 September 2020</span>&nbsp;·&nbsp;13 min</div></header><div class=post-content><p>A while ago, I stumbled upon an <a href=https://blog.jetbrains.com/kotlin/2019/12/making-kotlin-ready-for-data-science/>article</a> about the language Kotlin and how to use it for Data Science.
 I found it interesting, as some of Python&rsquo;s quirks were starting to bother me and I wanted to try something new.
 A day later, I had completed the Kotlin tutorials using <a href="https://www.jetbrains.com/help/education/learner-start-guide.html?section=Kotlin%20Koans&_ga=2.101592385.1724296010.1598524435-160366776.1590830721">Kotlin Koans</a> in IntelliJ IDEA (which is an excellent way to get started with Kotlin).
 Hungry to test out my new language skills, I looked around for a project idea.
 As I am a deep learning engineer, naturally I had a look at what DL frameworks Kotlin had to offer and arrived at DL4J.
 This is actually a Java framework, but as Kotlin is interoperable with Java, it can be used anyway.
-I had a look at some examples of how to build a network and found this (<a href=https://github.com/eclipse/deeplearning4j-examples/blob/master/dl4j-examples/src/main/kotlin/org/deeplearning4j/quickstartexamples/feedforward/mnist/MLPMnistTwoLayerExample.kt>Source</a>):</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
-    .seed(rngSeed.toLong()) <span style=color:#75715e>//include a random seed for reproducibility
-</span><span style=color:#75715e></span>     <span style=color:#75715e>// use stochastic gradient descent as an optimization algorithm
-</span><span style=color:#75715e></span>    
-    .activation(Activation.RELU)
-    .weightInit(WeightInit.XAVIER)
-    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>)) <span style=color:#75715e>//specify the rate of change of the learning rate.
-</span><span style=color:#75715e></span>    .l2(rate * <span style=color:#ae81ff>0.005</span>) <span style=color:#75715e>// regularize learning model
-</span><span style=color:#75715e></span>    .list()
-    .layer(DenseLayer.Builder() <span style=color:#75715e>//create the first input layer.
-</span><span style=color:#75715e></span>        .nIn(numRows * numColumns)
-        .nOut(<span style=color:#ae81ff>500</span>)
-        .build())
-    .layer(DenseLayer.Builder() <span style=color:#75715e>//create the second input layer
-</span><span style=color:#75715e></span>        .nIn(<span style=color:#ae81ff>500</span>)
-        .nOut(<span style=color:#ae81ff>100</span>)
-        .build())
-    .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) <span style=color:#75715e>//create hidden layer
-</span><span style=color:#75715e></span>        .activation(Activation.SOFTMAX)
-        .nIn(<span style=color:#ae81ff>100</span>)
-        .nOut(outputNum)
-        .build())
-    .build()
-
-<span style=color:#66d9ef>val</span> model = MultiLayerNetwork(conf)
-model.<span style=color:#66d9ef>init</span>()
-</code></pre></div><p>Coming from Python and PyTorch, I just thought: &ldquo;Damn, that&rsquo;s not pretty!&rdquo;.
+I had a look at some examples of how to build a network and found this (<a href=https://github.com/eclipse/deeplearning4j-examples/blob/master/dl4j-examples/src/main/kotlin/org/deeplearning4j/quickstartexamples/feedforward/mnist/MLPMnistTwoLayerExample.kt>Source</a>):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
+</span></span><span style=display:flex><span>    .seed(rngSeed.toLong()) <span style=color:#75715e>//include a random seed for reproducibility
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>     <span style=color:#75715e>// use stochastic gradient descent as an optimization algorithm
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    
+</span></span><span style=display:flex><span>    .activation(Activation.RELU)
+</span></span><span style=display:flex><span>    .weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>)) <span style=color:#75715e>//specify the rate of change of the learning rate.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    .l2(rate * <span style=color:#ae81ff>0.005</span>) <span style=color:#75715e>// regularize learning model
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    .list()
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder() <span style=color:#75715e>//create the first input layer.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        .nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder() <span style=color:#75715e>//create the second input layer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        .nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD) <span style=color:#75715e>//create hidden layer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        .activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>        .nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .nOut(outputNum)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .build()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> model = MultiLayerNetwork(conf)
+</span></span><span style=display:flex><span>model.<span style=color:#66d9ef>init</span>()
+</span></span></code></pre></div><p>Coming from Python and PyTorch, I just thought: &ldquo;Damn, that&rsquo;s not pretty!&rdquo;.
 Maybe it&rsquo;s just my bias because I think Java code is ugly as hell.
 On the other hand, Kotlin promised to reduce the verbosity that makes Java so hard to read, so maybe I could do something about this.
 At this point, my project began to take form.
 What if I could use the nice Kotlin techniques from the tutorial to make network declarations in DL4J more readable.
-I arrived at this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = sequential {
-    seed(rngSeed.toLong()) <span style=color:#75715e>//include a random seed for reproducibility
-</span><span style=color:#75715e></span>    <span style=color:#75715e>// use stochastic gradient descent as an optimization algorithm
-</span><span style=color:#75715e></span>    
-    activation(Activation.RELU)
-    weightInit(WeightInit.XAVIER)
-    updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>)) <span style=color:#75715e>//specify the rate of change of the learning rate.
-</span><span style=color:#75715e></span>    l2(rate * <span style=color:#ae81ff>0.005</span>) <span style=color:#75715e>// regularize learning model
-</span><span style=color:#75715e></span>    layers {
-       dense {
-           nIn(numRows * numColumns)
-           nOut(<span style=color:#ae81ff>500</span>)
-       }
-       dense {
-           nIn(<span style=color:#ae81ff>500</span>)
-           nOut(<span style=color:#ae81ff>100</span>)
-       }
-       output {
-           lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
-           activation(Activation.SOFTMAX)
-           nIn(<span style=color:#ae81ff>100</span>)
-           nOut(outputNum)
-       }
-    }
-}
-
-<span style=color:#66d9ef>val</span> model = MultiLayerNetwork(conf)
-model.<span style=color:#66d9ef>init</span>()
-</code></pre></div><p>This code snippet defines exactly the same network as the one before but omits all the syntactic clutter.
+I arrived at this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = sequential {
+</span></span><span style=display:flex><span>    seed(rngSeed.toLong()) <span style=color:#75715e>//include a random seed for reproducibility
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// use stochastic gradient descent as an optimization algorithm
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    
+</span></span><span style=display:flex><span>    activation(Activation.RELU)
+</span></span><span style=display:flex><span>    weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>)) <span style=color:#75715e>//specify the rate of change of the learning rate.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    l2(rate * <span style=color:#ae81ff>0.005</span>) <span style=color:#75715e>// regularize learning model
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    layers {
+</span></span><span style=display:flex><span>       dense {
+</span></span><span style=display:flex><span>           nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>           nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>       }
+</span></span><span style=display:flex><span>       dense {
+</span></span><span style=display:flex><span>           nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>           nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>       }
+</span></span><span style=display:flex><span>       output {
+</span></span><span style=display:flex><span>           lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>           activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>           nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>           nOut(outputNum)
+</span></span><span style=display:flex><span>       }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> model = MultiLayerNetwork(conf)
+</span></span><span style=display:flex><span>model.<span style=color:#66d9ef>init</span>()
+</span></span></code></pre></div><p>This code snippet defines exactly the same network as the one before but omits all the syntactic clutter.
 No more dots before the function calls because we don&rsquo;t have to hide a gigantic one-liner anymore.
 No more calling <code>layer</code> each time when adding a new layer.
 No more creating a <code>Builder</code> object for each layer.
 No more calling <code>build</code> after each layer configuration.
-In my opinion, this is a definite improvement over the Java version and much more readable.</p>
-<p>How did I do this?
+In my opinion, this is a definite improvement over the Java version and much more readable.</p><p>How did I do this?
 With the Domain-Specific Language (DSL) feature of Kotlin and much less code than I expected.
-The result is a small library named <em>Klay</em> (Kotlin LAYers) that can be used to define neural networks in DL4J.</p>
-<p>So without further ado, let&rsquo;s dive into what exactly DL4J does and how <em>Klay</em> makes it easier.
-You can find all the code shown here at <a href=https://www.github.com/tilman151/klay>github.com/tilman151/klay</a>.</p>
-<h2 id=how-dl4j-defines-neural-networks>How DL4J Defines Neural Networks<a hidden class=anchor aria-hidden=true href=#how-dl4j-defines-neural-networks>#</a></h2>
-<p>The API of DL4J reminded me of Keras a lot.
+The result is a small library named <em>Klay</em> (Kotlin LAYers) that can be used to define neural networks in DL4J.</p><p>So without further ado, let&rsquo;s dive into what exactly DL4J does and how <em>Klay</em> makes it easier.
+You can find all the code shown here at <a href=https://www.github.com/tilman151/klay>github.com/tilman151/klay</a>.</p><h2 id=how-dl4j-defines-neural-networks>How DL4J Defines Neural Networks<a hidden class=anchor aria-hidden=true href=#how-dl4j-defines-neural-networks>#</a></h2><p>The API of DL4J reminded me of Keras a lot.
 It follows a <em>define-and-run</em> scheme which means that you first build a computation graph and then run it with your inputs.
-Coming from PyTorch, which uses a <em>define-by-run</em> scheme, this was something I had to adjust to again.</p>
-<p>Everything starts with the <code>NeuralNetConfiguration</code> class.
+Coming from PyTorch, which uses a <em>define-by-run</em> scheme, this was something I had to adjust to again.</p><p>Everything starts with the <code>NeuralNetConfiguration</code> class.
 Instances of this class, hold all the information we need to build the computation graph of our network.
 Creating a new <code>NeuralNetConfiguration</code> follows a builder pattern.
 We first create a <code>NeuralNetConfiguration.Builder</code> that provides member functions to set the properties of our configuration.
 Each of these functions, e.g. <code>updater</code> to set the weight updating algorithm, returns the <code>Builder</code> instance.
 This makes it easy to chain calls.
-When we are done, we call the <code>build</code> function to receive our configuration object:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
-    .seed(rngSeed.toLong())
-    .activation(Activation.RELU)
-    .weightInit(WeightInit.XAVIER)
-    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    .build()
-</code></pre></div><p>By calling a function like <code>activation</code>, we set the default value for all layers of the network.
-The example above uses <em>ReLU</em> activation and <em>Xavier</em> initialization for all layers if not specified otherwise in the layer itself.</p>
-<p>To add layers to the network, we call the <code>list</code> function of the <code>Builder</code> object.
-This gives us a <code>ListBuilder</code> where we can add a layer by passing a layer configuration to its <code>layer</code> function:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
-    .list()
-    .layer(DenseLayer.Builder()
-        .nIn(numRows * numColumns)
-        .nOut(<span style=color:#ae81ff>500</span>)
-        .build())
-    .build()
-</code></pre></div><p>Layer configurations follow the same pattern as the overall network.
-We create a <code>Builder</code> for the desired layer, call its configuration functions, and then <code>build</code>.</p>
-<p>The last step is building a computation graph from our configuration.
-This can be done by simply instantiating a <code>MultiLayerNetwork</code> object:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> model = MultiLayerNetwork(conf)
-model.<span style=color:#66d9ef>init</span>()
-</code></pre></div><p>We can train our network, by feeding batches from a <code>DataSetIterator</code>, e.g. MNIST:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> mnistTrain = MnistDataSetIterator(batchSize, <span style=color:#66d9ef>true</span>, rngSeed)
-model.fit(mnistTrain, numEpochs)
-</code></pre></div><p>Now that we know how DL4J builds networks, let&rsquo;s have a look at what Kotlin brings to the table.</p>
-<h2 id=domain-specific-languages-in-kotlin>Domain-Specific Languages in Kotlin<a hidden class=anchor aria-hidden=true href=#domain-specific-languages-in-kotlin>#</a></h2>
-<p>Kotlin brings a bunch of nice features with it and describing them all would break the scope of this article.
+When we are done, we call the <code>build</code> function to receive our configuration object:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
+</span></span><span style=display:flex><span>    .seed(rngSeed.toLong())
+</span></span><span style=display:flex><span>    .activation(Activation.RELU)
+</span></span><span style=display:flex><span>    .weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    .build()
+</span></span></code></pre></div><p>By calling a function like <code>activation</code>, we set the default value for all layers of the network.
+The example above uses <em>ReLU</em> activation and <em>Xavier</em> initialization for all layers if not specified otherwise in the layer itself.</p><p>To add layers to the network, we call the <code>list</code> function of the <code>Builder</code> object.
+This gives us a <code>ListBuilder</code> where we can add a layer by passing a layer configuration to its <code>layer</code> function:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
+</span></span><span style=display:flex><span>    .list()
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>        .nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .build()
+</span></span></code></pre></div><p>Layer configurations follow the same pattern as the overall network.
+We create a <code>Builder</code> for the desired layer, call its configuration functions, and then <code>build</code>.</p><p>The last step is building a computation graph from our configuration.
+This can be done by simply instantiating a <code>MultiLayerNetwork</code> object:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> model = MultiLayerNetwork(conf)
+</span></span><span style=display:flex><span>model.<span style=color:#66d9ef>init</span>()
+</span></span></code></pre></div><p>We can train our network, by feeding batches from a <code>DataSetIterator</code>, e.g. MNIST:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> mnistTrain = MnistDataSetIterator(batchSize, <span style=color:#66d9ef>true</span>, rngSeed)
+</span></span><span style=display:flex><span>model.fit(mnistTrain, numEpochs)
+</span></span></code></pre></div><p>Now that we know how DL4J builds networks, let&rsquo;s have a look at what Kotlin brings to the table.</p><h2 id=domain-specific-languages-in-kotlin>Domain-Specific Languages in Kotlin<a hidden class=anchor aria-hidden=true href=#domain-specific-languages-in-kotlin>#</a></h2><p>Kotlin brings a bunch of nice features with it and describing them all would break the scope of this article.
 Therefore, we will focus on the features that make defining Domain-Specific Languages (DSLs) in Kotlin so easy.
-DSL is quite a buzzword (memorize it if you want to impress your superiors), so to be clear, I am referring to the definition on the Kotlin <a href=https://kotlinlang.org/docs/reference/type-safe-builders.html>website</a>:</p>
-<blockquote>
-<p>Type-safe builders allow creating Kotlin-based domain-specific languages (DSLs) suitable for building complex hierarchical data structures in a semi-declarative way. Some of the example use cases for the builders are:</p>
-<ul>
-<li>Generating markup with Kotlin code, such as HTML or XML</li>
-<li>Programmatically laying out UI components: Anko</li>
-<li>Configuring routes for a web server: Ktor.</li>
-</ul>
-</blockquote>
-<p>Using this definition, DL4J, in a way, already has a DSL for defining network structures, albeit an ugly one.
+DSL is quite a buzzword (memorize it if you want to impress your superiors), so to be clear, I am referring to the definition on the Kotlin <a href=https://kotlinlang.org/docs/reference/type-safe-builders.html>website</a>:</p><blockquote><p>Type-safe builders allow creating Kotlin-based domain-specific languages (DSLs) suitable for building complex hierarchical data structures in a semi-declarative way. Some of the example use cases for the builders are:</p><ul><li>Generating markup with Kotlin code, such as HTML or XML</li><li>Programmatically laying out UI components: Anko</li><li>Configuring routes for a web server: Ktor.</li></ul></blockquote><p>Using this definition, DL4J, in a way, already has a DSL for defining network structures, albeit an ugly one.
 Thus, we only need to wrap the existing language into a readable one.
 Because Kotlin is a JVM language and interoperable with Java, I will use Java instead of Python as a reference point in the following paragraphs.
-So here comes all my Java skill from the first semester.</p>
-<p><em>Skip this part if you know everything about higher-order functions, Lambda expressions, and extension functions.</em></p>
-<h3 id=extension-functions>Extension Functions<a hidden class=anchor aria-hidden=true href=#extension-functions>#</a></h3>
-<p>The first concept we need is extension functions.
-In Java, all of a class' member functions are defined inside it.
-If we want to add a member function, we would need to create a child class:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Base</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>int</span> bar<span style=color:#f92672>;</span>
-
-    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>foo</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> bar<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-        <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>bar</span> <span style=color:#f92672>=</span> bar<span style=color:#f92672>;</span>
-    <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-<span style=color:#75715e>// Adding a getter for bar
-</span><span style=color:#75715e></span>
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Child</span> <span style=color:#66d9ef>extends</span> Base <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>getBar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>bar</span><span style=color:#f92672>;</span>
-    <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-</code></pre></div><p>In Kotlin, we can instead use an extension function like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>Base</span>.getBar() {
-    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span>.bar
-}
-</code></pre></div><p>The <code>this</code> keyword refers to the instance of the <code>Base</code> class we called the function on.
+So here comes all my Java skill from the first semester.</p><p><em>Skip this part if you know everything about higher-order functions, Lambda expressions, and extension functions.</em></p><h3 id=extension-functions>Extension Functions<a hidden class=anchor aria-hidden=true href=#extension-functions>#</a></h3><p>The first concept we need is extension functions.
+In Java, all of a class&rsquo; member functions are defined inside it.
+If we want to add a member function, we would need to create a child class:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Base</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>int</span> bar<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>foo</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> bar<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>bar</span> <span style=color:#f92672>=</span> bar<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// Adding a getter for bar
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Child</span> <span style=color:#66d9ef>extends</span> Base <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>getBar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>bar</span><span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>In Kotlin, we can instead use an extension function like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>Base</span>.getBar() {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span>.bar
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The <code>this</code> keyword refers to the instance of the <code>Base</code> class we called the function on.
 We can write code exactly as if the extension function is a normal member of the class.
-Therefore, we can omit the <code>this</code> keyword, too:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>Base</span>.getBar() {
-    <span style=color:#66d9ef>return</span> bar
-}
-</code></pre></div><p>This way we can add functions and even properties to Java and Kotlin classes without inheriting or modifying them.
+Therefore, we can omit the <code>this</code> keyword, too:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>Base</span>.getBar() {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> bar
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This way we can add functions and even properties to Java and Kotlin classes without inheriting or modifying them.
 Overloading functions is possible, too.
 The approach has an important advantage over sub-classing: we don&rsquo;t have to substitute our usage of the class <code>Base</code>.
 All code that is working with <code>Base</code> at the moment will continue to do so and no casting is involved if we want to call our new function.
-We only need to import the extension function beforehand.</p>
-<h3 id=higher-order-functions-and-lambdas>Higher-Order Functions and Lambdas<a hidden class=anchor aria-hidden=true href=#higher-order-functions-and-lambdas>#</a></h3>
-<p>Higher-order functions are functions that take other functions as arguments.
-A Java example is the <code>forEach</code> function that applies a function to each element of an <code>Iterable</code>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Arithmetic</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>inc</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> n<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-        <span style=color:#66d9ef>return</span> <span style=color:#f92672>++</span>n<span style=color:#f92672>;</span>
-    <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-<span style=color:#75715e>// ...
-</span><span style=color:#75715e></span>
-ArrayList<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> numbers <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ArrayList<span style=color:#f92672>&lt;&gt;(</span>List<span style=color:#f92672>.</span><span style=color:#a6e22e>of</span><span style=color:#f92672>(</span>1<span style=color:#f92672>,</span> 2<span style=color:#f92672>,</span> 3<span style=color:#f92672>));</span> 
-ArrayList<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> incrementedNumbers <span style=color:#f92672>=</span> numbers<span style=color:#f92672>.</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>(</span>Arithmetic<span style=color:#f92672>::</span>inc<span style=color:#f92672>);</span>
-</code></pre></div><p>We pass a reference of the static method <code>inc</code> in the class <code>Arithmetic</code> to <code>forEach</code> and receive an <code>ArrayList</code> of incremented numbers.
+We only need to import the extension function beforehand.</p><h3 id=higher-order-functions-and-lambdas>Higher-Order Functions and Lambdas<a hidden class=anchor aria-hidden=true href=#higher-order-functions-and-lambdas>#</a></h3><p>Higher-order functions are functions that take other functions as arguments.
+A Java example is the <code>forEach</code> function that applies a function to each element of an <code>Iterable</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Arithmetic</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>inc</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> n<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>++</span>n<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>ArrayList<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> numbers <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ArrayList<span style=color:#f92672>&lt;&gt;(</span>List<span style=color:#f92672>.</span><span style=color:#a6e22e>of</span><span style=color:#f92672>(</span>1<span style=color:#f92672>,</span> 2<span style=color:#f92672>,</span> 3<span style=color:#f92672>));</span> 
+</span></span><span style=display:flex><span>ArrayList<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> incrementedNumbers <span style=color:#f92672>=</span> numbers<span style=color:#f92672>.</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>(</span>Arithmetic<span style=color:#f92672>::</span>inc<span style=color:#f92672>);</span>
+</span></span></code></pre></div><p>We pass a reference of the static method <code>inc</code> in the class <code>Arithmetic</code> to <code>forEach</code> and receive an <code>ArrayList</code> of incremented numbers.
 Now, this is a lot of code for defining the function <code>forEach</code>.
-Fortunately we have Lambda expression at our hands to make things easier for us:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>ArrayList<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> incrementedNumbers <span style=color:#f92672>=</span> numbers<span style=color:#f92672>.</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>({(</span>n<span style=color:#f92672>)</span> <span style=color:#f92672>-&gt;</span> <span style=color:#f92672>++</span>n<span style=color:#f92672>});</span>
-</code></pre></div><p>We simply pass an anonymous function in the form of a Lambda expression to <code>forEach</code> and don&rsquo;t have to bother with defining it elsewhere.</p>
-<p>In Kotlin the process of using higher-order functions and Lambda expression is a little more streamlined.
-The <code>forEach</code> equivalent is called <code>map</code>, so our example looks like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> numbers = listOf(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>)
-<span style=color:#66d9ef>val</span> increasedNumbers = numbers.map({n <span style=color:#f92672>-&gt;</span> <span style=color:#f92672>++</span>n})
-</code></pre></div><p>In fact, Kotlin even lets us omit the parenthesis if the last argument of a function is a Lambda expression:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> increasedNumbers = numbers.map {n <span style=color:#f92672>-&gt;</span> <span style=color:#f92672>++</span>n}
-</code></pre></div><p>This way we got rid of all the syntactic clutter and receive code that is much more readable.</p>
-<p>But, this is not where it ends.
+Fortunately we have Lambda expression at our hands to make things easier for us:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>ArrayList<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>int</span><span style=color:#f92672>&gt;</span> incrementedNumbers <span style=color:#f92672>=</span> numbers<span style=color:#f92672>.</span><span style=color:#a6e22e>forEach</span><span style=color:#f92672>({(</span>n<span style=color:#f92672>)</span> <span style=color:#f92672>-&gt;</span> <span style=color:#f92672>++</span>n<span style=color:#f92672>});</span>
+</span></span></code></pre></div><p>We simply pass an anonymous function in the form of a Lambda expression to <code>forEach</code> and don&rsquo;t have to bother with defining it elsewhere.</p><p>In Kotlin the process of using higher-order functions and Lambda expression is a little more streamlined.
+The <code>forEach</code> equivalent is called <code>map</code>, so our example looks like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> numbers = listOf(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>3</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> increasedNumbers = numbers.map({n <span style=color:#f92672>-&gt;</span> <span style=color:#f92672>++</span>n})
+</span></span></code></pre></div><p>In fact, Kotlin even lets us omit the parenthesis if the last argument of a function is a Lambda expression:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> increasedNumbers = numbers.map {n <span style=color:#f92672>-&gt;</span> <span style=color:#f92672>++</span>n}
+</span></span></code></pre></div><p>This way we got rid of all the syntactic clutter and receive code that is much more readable.</p><p>But, this is not where it ends.
 Even extension functions from the previous section can be Lambda expressions.
-This way, we can call members of an object inside the Lambda Expression with the <code>this</code> statement:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>data</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span>(<span style=color:#66d9ef>val</span> name: String)
-<span style=color:#66d9ef>val</span> persons = listOf(Person(<span style=color:#e6db74>&#34;Foo&#34;</span>), Person(<span style=color:#e6db74>&#34;Bar&#34;</span>))
-
-<span style=color:#66d9ef>val</span> getName: Person.() <span style=color:#f92672>-&gt;</span> String = {<span style=color:#66d9ef>this</span>.name}
-<span style=color:#66d9ef>val</span> names = persons.map(getName)
-</code></pre></div><p>We first assigned the Lambda to a variable to declare the function type.
+This way, we can call members of an object inside the Lambda Expression with the <code>this</code> statement:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>data</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span>(<span style=color:#66d9ef>val</span> name: String)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> persons = listOf(Person(<span style=color:#e6db74>&#34;Foo&#34;</span>), Person(<span style=color:#e6db74>&#34;Bar&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> getName: Person.() <span style=color:#f92672>-&gt;</span> String = {<span style=color:#66d9ef>this</span>.name}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> names = persons.map(getName)
+</span></span></code></pre></div><p>We first assigned the Lambda to a variable to declare the function type.
 Let&rsquo;s have a closer look.
 A Kotlin function type follows the scheme <code>argument types -> output type</code>.
 <code>Person.()</code> means that the Lambda takes an instance of the class <code>Person</code> which is called the <em>receiver</em>.
-The function returns a <code>String</code> which is signalized by the right-hand side of the arrow.</p>
-<p>Anonymous extension functions are especially helpful for initializing objects with the higher-order function <code>apply</code>:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>data</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span>(<span style=color:#66d9ef>val</span> name: String, <span style=color:#66d9ef>var</span> age: Int = <span style=color:#ae81ff>0</span>, <span style=color:#66d9ef>var</span> city: String = <span style=color:#e6db74>&#34;&#34;</span>)
-
-<span style=color:#66d9ef>val</span> p = Person(<span style=color:#e6db74>&#34;Foo&#34;</span>)
-p.apply {
-    age = <span style=color:#ae81ff>25</span>
-    city = <span style=color:#e6db74>&#34;Bar&#34;</span>
-}
-</code></pre></div><p>The return type of the Lambda, that is passed to <code>apply</code>, is <code>Unit</code> which means it returns nothing (similar to Java&rsquo;s <code>void</code>).
+The function returns a <code>String</code> which is signalized by the right-hand side of the arrow.</p><p>Anonymous extension functions are especially helpful for initializing objects with the higher-order function <code>apply</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>data</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Person</span>(<span style=color:#66d9ef>val</span> name: String, <span style=color:#66d9ef>var</span> age: Int = <span style=color:#ae81ff>0</span>, <span style=color:#66d9ef>var</span> city: String = <span style=color:#e6db74>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> p = Person(<span style=color:#e6db74>&#34;Foo&#34;</span>)
+</span></span><span style=display:flex><span>p.apply {
+</span></span><span style=display:flex><span>    age = <span style=color:#ae81ff>25</span>
+</span></span><span style=display:flex><span>    city = <span style=color:#e6db74>&#34;Bar&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The return type of the Lambda, that is passed to <code>apply</code>, is <code>Unit</code> which means it returns nothing (similar to Java&rsquo;s <code>void</code>).
 The function <code>apply</code> simply returns the receiver object.
-Alternatively, we could use the <code>run</code> function, which returns the result of the last call in the Lambda:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> p = Person(<span style=color:#e6db74>&#34;Foo&#34;</span>)
-print(p.run {
-    age = <span style=color:#ae81ff>25</span>
-    age
- })
-</code></pre></div><p>With all that theory in our mind, let us see how all this leads to our neural network DSL.</p>
-<h2 id=klay-for-defining-neural-networks>Klay for Defining Neural Networks<a hidden class=anchor aria-hidden=true href=#klay-for-defining-neural-networks>#</a></h2>
-<p>Our little &ldquo;library&rdquo;, <em>Klay</em>, makes heavy use of higher-order functions, extension functions, and Lambdas with receivers.
+Alternatively, we could use the <code>run</code> function, which returns the result of the last call in the Lambda:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> p = Person(<span style=color:#e6db74>&#34;Foo&#34;</span>)
+</span></span><span style=display:flex><span>print(p.run {
+</span></span><span style=display:flex><span>    age = <span style=color:#ae81ff>25</span>
+</span></span><span style=display:flex><span>    age
+</span></span><span style=display:flex><span> })
+</span></span></code></pre></div><p>With all that theory in our mind, let us see how all this leads to our neural network DSL.</p><h2 id=klay-for-defining-neural-networks>Klay for Defining Neural Networks<a hidden class=anchor aria-hidden=true href=#klay-for-defining-neural-networks>#</a></h2><p>Our little &ldquo;library&rdquo;, <em>Klay</em>, makes heavy use of higher-order functions, extension functions, and Lambdas with receivers.
 It is not much different from the example in the <a href=https://kotlinlang.org/docs/reference/type-safe-builders.html>official Kotlin docs</a> that builds HTML.
-Let&rsquo;s have a look again at our DL4J example:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
-    .seed(rngSeed.toLong())
-    .activation(Activation.RELU)
-    .weightInit(WeightInit.XAVIER)
-    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    .l2(rate * <span style=color:#ae81ff>0.005</span>)
-    .list()
-    .layer(DenseLayer.Builder()
-        .nIn(numRows * numColumns)
-        .nOut(<span style=color:#ae81ff>500</span>)
-        .build())
-    .layer(DenseLayer.Builder()
-        .nIn(<span style=color:#ae81ff>500</span>)
-        .nOut(<span style=color:#ae81ff>100</span>)
-        .build())
-    .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
-        .activation(Activation.SOFTMAX)
-        .nIn(<span style=color:#ae81ff>100</span>)
-        .nOut(outputNum)
-        .build())
-    .build()
-</code></pre></div><p>As you probably remember, the first step of building a neural network in DL4J is creating a <code>NeuralNetConfiguration.Builder</code>.
-Using our knowledge about Lambdas with receivers, we can write the following function:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>sequential</span>(<span style=color:#66d9ef>init</span>: NeuralNetConfiguration.Builder.() <span style=color:#f92672>-&gt;</span> NeuralNetConfiguration.ListBuilder): MultiLayerConfiguration {
-    <span style=color:#66d9ef>return</span> NeuralNetConfiguration.Builder().run(<span style=color:#66d9ef>init</span>).build()
-}
-</code></pre></div><p>This function takes a Lambda, <code>init</code>, with a <code>NeuralNetConfiguration.Builder</code> receiver.
+Let&rsquo;s have a look again at our DL4J example:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = NeuralNetConfiguration.Builder()
+</span></span><span style=display:flex><span>    .seed(rngSeed.toLong())
+</span></span><span style=display:flex><span>    .activation(Activation.RELU)
+</span></span><span style=display:flex><span>    .weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    .l2(rate * <span style=color:#ae81ff>0.005</span>)
+</span></span><span style=display:flex><span>    .list()
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>        .nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>        .nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>        .activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>        .nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .nOut(outputNum)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .build()
+</span></span></code></pre></div><p>As you probably remember, the first step of building a neural network in DL4J is creating a <code>NeuralNetConfiguration.Builder</code>.
+Using our knowledge about Lambdas with receivers, we can write the following function:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>sequential</span>(<span style=color:#66d9ef>init</span>: NeuralNetConfiguration.Builder.() <span style=color:#f92672>-&gt;</span> NeuralNetConfiguration.ListBuilder): MultiLayerConfiguration {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> NeuralNetConfiguration.Builder().run(<span style=color:#66d9ef>init</span>).build()
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This function takes a Lambda, <code>init</code>, with a <code>NeuralNetConfiguration.Builder</code> receiver.
 The receiver object is created inside the <code>sequential</code> function.
 We call the higher-order function <code>run</code> on our receiver object and get a <code>NeuralNetConfiguration.ListBuilder</code> object which we then build into a <code>MultiLayerConfiguration</code>.
-Using this function would look like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = sequential( {
-    <span style=color:#66d9ef>this</span>.seed(rngSeed.toLong())
-    <span style=color:#66d9ef>this</span>.activation(Activation.RELU)
-    <span style=color:#66d9ef>this</span>.weightInit(WeightInit.XAVIER)
-    <span style=color:#66d9ef>this</span>.updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    <span style=color:#66d9ef>this</span>.l2(rate * <span style=color:#ae81ff>0.005</span>)
-    <span style=color:#66d9ef>this</span>.list()
-    .layer(DenseLayer.Builder()
-        .nIn(numRows * numColumns)
-        .nOut(<span style=color:#ae81ff>500</span>)
-        .build())
-    .layer(DenseLayer.Builder()
-        .nIn(<span style=color:#ae81ff>500</span>)
-        .nOut(<span style=color:#ae81ff>100</span>)
-        .build())
-    .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
-        .activation(Activation.SOFTMAX)
-        .nIn(<span style=color:#ae81ff>100</span>)
-        .nOut(outputNum)
-        .build())
-} )
-</code></pre></div><p>Inside the <code>init</code> Lambda, we have access to all member functions of the <code>Builder</code> via <code>this</code> to configure defaults.
+Using this function would look like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = sequential( {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.seed(rngSeed.toLong())
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.activation(Activation.RELU)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.l2(rate * <span style=color:#ae81ff>0.005</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.list()
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>        .nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>        .nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>        .nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>        .activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>        .nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .nOut(outputNum)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>} )
+</span></span></code></pre></div><p>Inside the <code>init</code> Lambda, we have access to all member functions of the <code>Builder</code> via <code>this</code> to configure defaults.
 Calling the <code>list</code> function, we can add layers the conventional way.
 <code>list</code> and each call of <code>layer</code> return a <code>NeuralNetConfiguration.ListBuilder</code> object.
-As <code>layer</code> is the last function call in the Lambda expression, its resulting <code>Builder</code> is returned to <code>sequential</code> to be built there.</p>
-<p>Next, we want to get rid of the call to <code>list</code>.
-We will define an extension function of <code>NeuralNetConfiguration.Builder</code> like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>NeuralNetConfiguration</span>.Builder.layers(<span style=color:#66d9ef>init</span>: NeuralNetConfiguration.ListBuilder.() <span style=color:#f92672>-&gt;</span> Unit): NeuralNetConfiguration.ListBuilder {
-    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span>.list().apply(<span style=color:#66d9ef>init</span>)
-}
-</code></pre></div><p>Inside the function, we call <code>list</code> and use the higher-order function <code>apply</code> to execute our Lambda expression <code>init</code> on it.
-This simplifies our example like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = sequential( {
-    <span style=color:#66d9ef>this</span>.seed(rngSeed.toLong())
-    <span style=color:#66d9ef>this</span>.activation(Activation.RELU)
-    <span style=color:#66d9ef>this</span>.weightInit(WeightInit.XAVIER)
-    <span style=color:#66d9ef>this</span>.updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    <span style=color:#66d9ef>this</span>.l2(rate * <span style=color:#ae81ff>0.005</span>)
-    <span style=color:#66d9ef>this</span>.layers( {
-        layer(DenseLayer.Builder()
-            .nIn(numRows * numColumns)
-            .nOut(<span style=color:#ae81ff>500</span>)
-            .build())
-        layer(DenseLayer.Builder()
-            .nIn(<span style=color:#ae81ff>500</span>)
-            .nOut(<span style=color:#ae81ff>100</span>)
-            .build())
-        layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
-            .activation(Activation.SOFTMAX)
-            .nIn(<span style=color:#ae81ff>100</span>)
-            .nOut(outputNum)
-            .build())
-    } )
-} )
-</code></pre></div><p><code>apply</code> returns the <code>ListBuilder</code> created by <code>list</code>.
-Therefore, our function can be used as a drop-in replacement.</p>
-<p>The last offending code is the call of the <code>layer</code> function for adding each layer to the network.
+As <code>layer</code> is the last function call in the Lambda expression, its resulting <code>Builder</code> is returned to <code>sequential</code> to be built there.</p><p>Next, we want to get rid of the call to <code>list</code>.
+We will define an extension function of <code>NeuralNetConfiguration.Builder</code> like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>NeuralNetConfiguration</span>.Builder.layers(<span style=color:#66d9ef>init</span>: NeuralNetConfiguration.ListBuilder.() <span style=color:#f92672>-&gt;</span> Unit): NeuralNetConfiguration.ListBuilder {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span>.list().apply(<span style=color:#66d9ef>init</span>)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Inside the function, we call <code>list</code> and use the higher-order function <code>apply</code> to execute our Lambda expression <code>init</code> on it.
+This simplifies our example like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = sequential( {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.seed(rngSeed.toLong())
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.activation(Activation.RELU)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.l2(rate * <span style=color:#ae81ff>0.005</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.layers( {
+</span></span><span style=display:flex><span>        layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>            .nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>            .nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>            .build())
+</span></span><span style=display:flex><span>        layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>            .nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>            .nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>            .build())
+</span></span><span style=display:flex><span>        layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>            .activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>            .nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>            .nOut(outputNum)
+</span></span><span style=display:flex><span>            .build())
+</span></span><span style=display:flex><span>    } )
+</span></span><span style=display:flex><span>} )
+</span></span></code></pre></div><p><code>apply</code> returns the <code>ListBuilder</code> created by <code>list</code>.
+Therefore, our function can be used as a drop-in replacement.</p><p>The last offending code is the call of the <code>layer</code> function for adding each layer to the network.
 We can simply outsource the call, and the creation of the layer&rsquo;s <code>Builder</code> to an extension function of the <code>ListBuilder</code>.
-For the <code>DenseLayer</code> and <code>OutputLayer</code>, the functions looks like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>NeuralNetConfiguration</span>.ListBuilder.dense(<span style=color:#66d9ef>init</span>: DenseLayer.Builder.() <span style=color:#f92672>-&gt;</span> Unit) {
-    <span style=color:#66d9ef>this</span>.layer(DenseLayer.Builder().apply(<span style=color:#66d9ef>init</span>).build())
-}
-
-<span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>NeuralNetConfiguration</span>.ListBuilder.output(<span style=color:#66d9ef>init</span>: OutputLayer.Builder.() <span style=color:#f92672>-&gt;</span> Unit) {
-    <span style=color:#66d9ef>this</span>.layer(OutputLayer.Builder().apply(<span style=color:#66d9ef>init</span>).build())
-}
-</code></pre></div><p>The Lambda expression with the layer&rsquo;s <code>Builder</code> as the receiver lets us again conveniently configure the layer.
-Our example has now completely transformed:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = sequential( {
-    <span style=color:#66d9ef>this</span>.seed(rngSeed.toLong())
-    <span style=color:#66d9ef>this</span>.activation(Activation.RELU)
-    <span style=color:#66d9ef>this</span>.weightInit(WeightInit.XAVIER)
-    <span style=color:#66d9ef>this</span>.updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    <span style=color:#66d9ef>this</span>.l2(rate * <span style=color:#ae81ff>0.005</span>)
-    <span style=color:#66d9ef>this</span>.layers( {
-       <span style=color:#66d9ef>this</span>.dense( {
-           <span style=color:#66d9ef>this</span>.nIn(numRows * numColumns)
-           <span style=color:#66d9ef>this</span>.nOut(<span style=color:#ae81ff>500</span>)
-       } )
-       <span style=color:#66d9ef>this</span>.dense( {
-           <span style=color:#66d9ef>this</span>.nIn(<span style=color:#ae81ff>500</span>)
-           <span style=color:#66d9ef>this</span>.nOut(<span style=color:#ae81ff>100</span>)
-       } )
-       <span style=color:#66d9ef>this</span>.output( {
-           <span style=color:#66d9ef>this</span>.lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
-           <span style=color:#66d9ef>this</span>.activation(Activation.SOFTMAX)
-           <span style=color:#66d9ef>this</span>.nIn(<span style=color:#ae81ff>100</span>)
-           <span style=color:#66d9ef>this</span>.nOut(outputNum)
-       } )
-    } )
-} )
-</code></pre></div><p>But wait, this isn&rsquo;t even its final form.
-Now we have to apply all of Kotlin&rsquo;s syntactic sugar, i.e. removing <code>this</code> and the parenthesis, et voila:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> conf = sequential {
-    seed(rngSeed.toLong())
-    activation(Activation.RELU)
-    weightInit(WeightInit.XAVIER)
-    updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    l2(rate * <span style=color:#ae81ff>0.005</span>)
-    layers {
-       dense {
-           nIn(numRows * numColumns)
-           nOut(<span style=color:#ae81ff>500</span>)
-       }
-       dense {
-           nIn(<span style=color:#ae81ff>500</span>)
-           nOut(<span style=color:#ae81ff>100</span>)
-       }
-       output {
-           lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
-           activation(Activation.SOFTMAX)
-           nIn(<span style=color:#ae81ff>100</span>)
-           nOut(outputNum)
-       }
-    }
-}
-</code></pre></div><p>We are done.
+For the <code>DenseLayer</code> and <code>OutputLayer</code>, the functions looks like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>NeuralNetConfiguration</span>.ListBuilder.dense(<span style=color:#66d9ef>init</span>: DenseLayer.Builder.() <span style=color:#f92672>-&gt;</span> Unit) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.layer(DenseLayer.Builder().apply(<span style=color:#66d9ef>init</span>).build())
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fun</span> <span style=color:#a6e22e>NeuralNetConfiguration</span>.ListBuilder.output(<span style=color:#66d9ef>init</span>: OutputLayer.Builder.() <span style=color:#f92672>-&gt;</span> Unit) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.layer(OutputLayer.Builder().apply(<span style=color:#66d9ef>init</span>).build())
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The Lambda expression with the layer&rsquo;s <code>Builder</code> as the receiver lets us again conveniently configure the layer.
+Our example has now completely transformed:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = sequential( {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.seed(rngSeed.toLong())
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.activation(Activation.RELU)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.l2(rate * <span style=color:#ae81ff>0.005</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span>.layers( {
+</span></span><span style=display:flex><span>       <span style=color:#66d9ef>this</span>.dense( {
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>       } )
+</span></span><span style=display:flex><span>       <span style=color:#66d9ef>this</span>.dense( {
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>       } )
+</span></span><span style=display:flex><span>       <span style=color:#66d9ef>this</span>.output( {
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>           <span style=color:#66d9ef>this</span>.nOut(outputNum)
+</span></span><span style=display:flex><span>       } )
+</span></span><span style=display:flex><span>    } )
+</span></span><span style=display:flex><span>} )
+</span></span></code></pre></div><p>But wait, this isn&rsquo;t even its final form.
+Now we have to apply all of Kotlin&rsquo;s syntactic sugar, i.e. removing <code>this</code> and the parenthesis, et voila:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = sequential {
+</span></span><span style=display:flex><span>    seed(rngSeed.toLong())
+</span></span><span style=display:flex><span>    activation(Activation.RELU)
+</span></span><span style=display:flex><span>    weightInit(WeightInit.XAVIER)
+</span></span><span style=display:flex><span>    updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    l2(rate * <span style=color:#ae81ff>0.005</span>)
+</span></span><span style=display:flex><span>    layers {
+</span></span><span style=display:flex><span>       dense {
+</span></span><span style=display:flex><span>           nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>           nOut(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>       }
+</span></span><span style=display:flex><span>       dense {
+</span></span><span style=display:flex><span>           nIn(<span style=color:#ae81ff>500</span>)
+</span></span><span style=display:flex><span>           nOut(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>       }
+</span></span><span style=display:flex><span>       output {
+</span></span><span style=display:flex><span>           lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>           activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>           nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>           nOut(outputNum)
+</span></span><span style=display:flex><span>       }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>We are done.
 All this with only four new functions.
-Extending our little library for new layers now only takes one function each.</p>
-<p>Another point where <em>Klay</em> shines is procedurally generating network layer declarations.
+Extending our little library for new layers now only takes one function each.</p><p>Another point where <em>Klay</em> shines is procedurally generating network layer declarations.
 A common example would be to add several dense layers with an increasing number of units to our network with a loop.
-In standard DL4J it would look like this:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> units = listOf(<span style=color:#ae81ff>100</span>, <span style=color:#ae81ff>200</span>, <span style=color:#ae81ff>300</span>, <span style=color:#ae81ff>400</span>)
-
-<span style=color:#66d9ef>val</span> unfinished = NeuralNetConfiguration.Builder()
-    .activation(Activation.RELU)
-    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-    .list()
-    .layer(DenseLayer.Builder()
-             .nIn(numRows * numColumns)
-             .nOut(units[<span style=color:#ae81ff>0</span>])
-             .build())
-
-<span style=color:#66d9ef>for</span> (u <span style=color:#66d9ef>in</span> units.zipWithNext()) {
-    unfinished.layer(DenseLayer.Builder()
-        .nIn(u.first)
-        .nOut(u.second)
-        .build())
-}
-
-<span style=color:#66d9ef>val</span> conf = unfinished.layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
-        .activation(Activation.SOFTMAX)
-        .nIn(<span style=color:#ae81ff>100</span>)
-        .nOut(outputNum)
-        .build())
-    .build()
-</code></pre></div><p>As we can see, we have to break our declaration flow to insert the loop.
+In standard DL4J it would look like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> units = listOf(<span style=color:#ae81ff>100</span>, <span style=color:#ae81ff>200</span>, <span style=color:#ae81ff>300</span>, <span style=color:#ae81ff>400</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> unfinished = NeuralNetConfiguration.Builder()
+</span></span><span style=display:flex><span>    .activation(Activation.RELU)
+</span></span><span style=display:flex><span>    .updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>    .list()
+</span></span><span style=display:flex><span>    .layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>             .nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>             .nOut(units[<span style=color:#ae81ff>0</span>])
+</span></span><span style=display:flex><span>             .build())
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> (u <span style=color:#66d9ef>in</span> units.zipWithNext()) {
+</span></span><span style=display:flex><span>    unfinished.layer(DenseLayer.Builder()
+</span></span><span style=display:flex><span>        .nIn(u.first)
+</span></span><span style=display:flex><span>        .nOut(u.second)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> conf = unfinished.layer(OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>        .activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>        .nIn(<span style=color:#ae81ff>100</span>)
+</span></span><span style=display:flex><span>        .nOut(outputNum)
+</span></span><span style=display:flex><span>        .build())
+</span></span><span style=display:flex><span>    .build()
+</span></span></code></pre></div><p>As we can see, we have to break our declaration flow to insert the loop.
 This makes the code much uglier than before.
-Let&rsquo;s see the <em>Klay</em> declaration on the other hand:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=color:#66d9ef>val</span> units = listOf(<span style=color:#ae81ff>100</span>, <span style=color:#ae81ff>200</span>, <span style=color:#ae81ff>300</span>, <span style=color:#ae81ff>400</span>)
-<span style=color:#66d9ef>val</span> config = sequential {
-             activation(Activation.RELU)
-             updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
-             layers {
-                 dense {
-                     nIn(numRows * numColumns)
-                     nOut(units[<span style=color:#ae81ff>0</span>])
-                 }
-                 <span style=color:#66d9ef>for</span> (u <span style=color:#66d9ef>in</span> units.zipWithNext()) {
-                     dense {
-                         nIn(u.first)
-                         nOut(u.second)
-                     }
-                 }
-                 output {
-                     lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
-                     activation(Activation.SOFTMAX)
-                     nIn(units.last())
-                     nOut(outputNum)
-                 }
-             }
-         }
-</code></pre></div><p>The loop integrates nicely with the rest of the declaration, and we do not break the flow.
+Let&rsquo;s see the <em>Klay</em> declaration on the other hand:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-kotlin data-lang=kotlin><span style=display:flex><span><span style=color:#66d9ef>val</span> units = listOf(<span style=color:#ae81ff>100</span>, <span style=color:#ae81ff>200</span>, <span style=color:#ae81ff>300</span>, <span style=color:#ae81ff>400</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> config = sequential {
+</span></span><span style=display:flex><span>             activation(Activation.RELU)
+</span></span><span style=display:flex><span>             updater(Nesterovs(rate, <span style=color:#ae81ff>0.98</span>))
+</span></span><span style=display:flex><span>             layers {
+</span></span><span style=display:flex><span>                 dense {
+</span></span><span style=display:flex><span>                     nIn(numRows * numColumns)
+</span></span><span style=display:flex><span>                     nOut(units[<span style=color:#ae81ff>0</span>])
+</span></span><span style=display:flex><span>                 }
+</span></span><span style=display:flex><span>                 <span style=color:#66d9ef>for</span> (u <span style=color:#66d9ef>in</span> units.zipWithNext()) {
+</span></span><span style=display:flex><span>                     dense {
+</span></span><span style=display:flex><span>                         nIn(u.first)
+</span></span><span style=display:flex><span>                         nOut(u.second)
+</span></span><span style=display:flex><span>                     }
+</span></span><span style=display:flex><span>                 }
+</span></span><span style=display:flex><span>                 output {
+</span></span><span style=display:flex><span>                     lossFunction(LossFunction.NEGATIVELOGLIKELIHOOD)
+</span></span><span style=display:flex><span>                     activation(Activation.SOFTMAX)
+</span></span><span style=display:flex><span>                     nIn(units.last())
+</span></span><span style=display:flex><span>                     nOut(outputNum)
+</span></span><span style=display:flex><span>                 }
+</span></span><span style=display:flex><span>             }
+</span></span><span style=display:flex><span>         }
+</span></span></code></pre></div><p>The loop integrates nicely with the rest of the declaration, and we do not break the flow.
 The point is, this is not some gimmick I added in the background.
 This is out of the box functionality in Kotlin.
-We can use the full power of the programming language while staying true to our DSL.</p>
-<h2 id=is-klay-ready-to-use>Is <em>Klay</em> ready to use?<a hidden class=anchor aria-hidden=true href=#is-klay-ready-to-use>#</a></h2>
-<p>Yes, it is!
+We can use the full power of the programming language while staying true to our DSL.</p><h2 id=is-klay-ready-to-use>Is <em>Klay</em> ready to use?<a hidden class=anchor aria-hidden=true href=#is-klay-ready-to-use>#</a></h2><p>Yes, it is!
 Even though it took so few lines of code that it does not really warrant calling it a library, you can find it <a href=https://www.github.com/tilman151/klay>here</a>.
-All code is provided as-is, yadda, yadda, yadda.</p>
-<p>Currently, the library supports all operations needed to recreate the quickstart examples of DL4J.
+All code is provided as-is, yadda, yadda, yadda.</p><p>Currently, the library supports all operations needed to recreate the quickstart examples of DL4J.
 They are included in the project repository.
 Converting them from Java to Kotlin was, fortunately, extremely easy thanks to IntelliJ IDEA&rsquo;s automatic conversion function.
-If you are missing something and want to help out, feel free to send me a pull request.</p>
-<h2 id=conclusion>Conclusion<a hidden class=anchor aria-hidden=true href=#conclusion>#</a></h2>
-<p>I liked working with Kotlin for a change and maybe I will expand <em>Klay</em>&rsquo;s coverage of DL4J later on.
-On the other hand, I noticed that I am not as fluent in Kotlin as in Python which let me struggle a bit with this project.</p>
-<p>If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out <a href=https://stackoverflow.com/questions/63613459/generic-function-for-dl4j-in-kotlin>my question on StackOverflow</a> related to this article.
+If you are missing something and want to help out, feel free to send me a pull request.</p><h2 id=conclusion>Conclusion<a hidden class=anchor aria-hidden=true href=#conclusion>#</a></h2><p>I liked working with Kotlin for a change and maybe I will expand <em>Klay</em>&rsquo;s coverage of DL4J later on.
+On the other hand, I noticed that I am not as fluent in Kotlin as in Python which let me struggle a bit with this project.</p><p>If you are skilled in Java or Kotlin and know your way around generic functions, you may want to check out <a href=https://stackoverflow.com/questions/63613459/generic-function-for-dl4j-in-kotlin>my question on StackOverflow</a> related to this article.
 I was not able to make the layer building functions generic and would appreciate some input.
-You would really help me out there.</p>
-</div>
-<footer class=post-footer>
-<ul class=post-tags>
-<li><a href=https://tilman151.github.io/tags/cleancode/>cleancode</a></li>
-</ul>
-</footer>
-</article>
-</main>
-<footer class=footer>
-<span>&copy; 2022 <a href=https://tilman151.github.io>Don't Repeat Yourself</a></span>
-<span>
-Powered by
+You would really help me out there.</p></div><footer class=post-footer><ul class=post-tags><li><a href=https://tilman151.github.io/tags/cleancode/>cleancode</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2022 <a href=https://tilman151.github.io>Don't Repeat Yourself</a></span>
+<span>Powered by
 <a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
-        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a>
-</span>
-</footer>
-<a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
-</a><style>#cookie-notice{padding:1.5rem 1rem;display:none;text-align:center;position:fixed;bottom:0;width:100%;background:var(--border);color:var(--primary)}#cookie-notice a{display:inline-block;cursor:pointer;margin-left:1rem}@media(max-width:767px){#cookie-notice span{display:block;padding-top:3px;margin-bottom:1rem}#cookie-notice a{position:relative;bottom:4px}}</style>
-<div id=cookie-notice><span>I am using third-party cookies to count readers. If you don't want to be counted, please use incognito mode.</span><a id=cookie-notice-accept class="btn btn-primary btn-sm">OK</a><a href=/privacy class="btn btn-primary btn-sm">More info</a></div>
-<script>var clicky_site_ids,s;function createCookie(d,e,b){var c="",a;b&&(a=new Date,a.setTime(a.getTime()+b*24*60*60*1e3),c="; expires="+a.toUTCString()),document.cookie=d+"="+e+c+"; path=/"}function readCookie(e){for(var c=e+"=",d=document.cookie.split(';'),b=0,a;b<d.length;b++){for(a=d[b];a.charAt(0)==' ';)a=a.substring(1,a.length);if(a.indexOf(c)==0)return a.substring(c.length,a.length)}return null}function eraseCookie(a){createCookie(a,"",-1)}readCookie('cookie-notice-dismissed')=='true'?(clicky_site_ids=clicky_site_ids||[],clicky_site_ids.push(101271854),s=document.createElement('script'),s.src="https://static.getclicky.com/js",document.head.appendChild(s)):document.getElementById('cookie-notice').style.display='block',document.getElementById('cookie-notice-accept').addEventListener("click",function(){createCookie('cookie-notice-dismissed','true',31),document.getElementById('cookie-notice').style.display='none',location.reload()})</script>
-<script>let menu=document.getElementById('menu');menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener("click",function(b){b.preventDefault();var a=this.getAttribute("href").substr(1);window.matchMedia('(prefers-reduced-motion: reduce)').matches?document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(a)}']`).scrollIntoView({behavior:"smooth"}),a==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${a}`)})})</script>
-<script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script>
-<script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove('dark'),localStorage.setItem("pref-theme",'light')):(document.body.classList.add('dark'),localStorage.setItem("pref-theme",'dark'))})</script>
-</body>
-</html>
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg></a><style>#cookie-notice{padding:1.5rem 1rem;display:none;text-align:center;position:fixed;bottom:0;width:100%;background:var(--border);color:var(--primary)}#cookie-notice a{display:inline-block;cursor:pointer;margin-left:1rem}@media(max-width:767px){#cookie-notice span{display:block;padding-top:3px;margin-bottom:1rem}#cookie-notice a{position:relative;bottom:4px}}</style><div id=cookie-notice><span>I am using third-party cookies to count readers. If you don't want to be counted, please use incognito mode.</span><a id=cookie-notice-accept class="btn btn-primary btn-sm">OK</a><a href=/privacy class="btn btn-primary btn-sm">More info</a></div><script>function createCookie(e,t,n){var s,o="";n&&(s=new Date,s.setTime(s.getTime()+n*24*60*60*1e3),o="; expires="+s.toUTCString()),document.cookie=e+"="+t+o+"; path=/"}function readCookie(e){for(var t,s=e+"=",o=document.cookie.split(";"),n=0;n<o.length;n++){for(t=o[n];t.charAt(0)==" ";)t=t.substring(1,t.length);if(t.indexOf(s)==0)return t.substring(s.length,t.length)}return null}function eraseCookie(e){createCookie(e,"",-1)}if(readCookie("cookie-notice-dismissed")=="true"){var s,clicky_site_ids=clicky_site_ids||[];clicky_site_ids.push(101271854),s=document.createElement("script"),s.src="https://static.getclicky.com/js",document.head.appendChild(s)}else document.getElementById("cookie-notice").style.display="block";document.getElementById("cookie-notice-accept").addEventListener("click",function(){createCookie("cookie-notice-dismissed","true",31),document.getElementById("cookie-notice").style.display="none",location.reload()})</script><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
