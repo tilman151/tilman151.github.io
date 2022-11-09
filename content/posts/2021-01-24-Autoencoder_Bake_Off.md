@@ -6,6 +6,7 @@ date: 2021-01-24
 tags: [deeplearning]
 aliases:
     - /autoencoders/2021/01/24/Autoencoder_Bake_Off.html
+mathjax: true
 ---
 
 *"Another article comparing types of autoencoders?"*, you may think.
@@ -58,7 +59,7 @@ The output layer features a sigmoid activation function.
 Save for the shallow one, all autoencoders have three encoder and decoder layers each.
 
 The dimension of the latent space and the number of network parameters is held approximately constant.
-This means that a variational autoencoder will have more parameters than a vanilla one as the encoder has to produce $$2n$$ outputs for a latent space of dimension $$n$$.
+This means that a variational autoencoder will have more parameters than a vanilla one as the encoder has to produce $2n$ outputs for a latent space of dimension $n$.
 We make two training runs for each autoencoder: once with a latent space of 20 dimensions, and once with 2 dimensions.
 The model from the second training run is used for anomaly detection, the first one for all other tasks.
 Both variants are undercomplete, meaning that they have a higher input dimension than latent space dimension.
@@ -85,7 +86,7 @@ It is only here as a baseline.
 $$\hat{x} = \operatorname{dec}(\operatorname{enc}(x))$$
 
 Above you can see the reconstruction formula of the shallow autoencoder.
-The formula declares how an autoencoder reconstructs a sample $$x$$ in a semi-mathematical way.
+The formula declares how an autoencoder reconstructs a sample $x$ in a semi-mathematical way.
 
 A shallow autoencoder features only one layer in its encoder and decoder each.
 To distinguish the shallow autoencoder from a PCA, it uses a ReLU activation function in the encoder and a sigmoid in the decoder.
@@ -96,9 +97,9 @@ We will use binary cross-entropy (BCE) because it yielded better-looking images 
 If you want to know why this is a valid choice of a loss function, I recommend reading chapters 5.5 and 6.2.1 of the [Deep Learning Book](https://www.deeplearningbook.org/).
 As all following autoencoders, the shallow one is trained against the following version of BCE:
 
-$$\mathcal{L}_r = \frac{1}{N}\sum_{i=1}^N \sum_{j=1}^{h\cdot w} \operatorname{BCE}(\hat{x}_j^{(i)}, x_j^{(i)})$$
+$$\mathcal{L}\_r = \frac{1}{N}\sum\_{i=1}^N \sum\_{j=1}^{h\cdot w} \operatorname{BCE}(\hat{x}\_j^{(i)}, x\_j^{(i)})$$
 
-where $$x^{(i)}_j$$ is the $$j$$th pixel of the $$i$$th input image and $$\hat{x}^{(i)}_j$$ the corresponding reconstruction.
+where $x^{(i)}_j$ is the $j$th pixel of the $i$th input image and $\hat{x}^{(i)}_j$ the corresponding reconstruction.
 The loss is, hence, summed up per image, and averaged over the batch.
 This decision will become important for the variational autoencoder.
 
@@ -120,7 +121,7 @@ This second shallow autoencoder is trained with the encoded dataset.
 This process is repeated until we arrive at the innermost layers.
 In the end, we get a deep autoencoder out of *stacked* shallow autoencoders.
 
-We will train each of the $$n$$ layers for $$\frac{1}{n}th$$ of the total training epochs.
+We will train each of the $n$ layers for $\frac{1}{n}th$ of the total training epochs.
 
 As the stacked autoencoder differs from a deep one only by training procedure, it has the same reconstruction function, too.
 Again, we have no restrictions on the latent space, but the encoding is expected to be worse due to the greedy training procedure.
@@ -128,25 +129,25 @@ Again, we have no restrictions on the latent space, but the encoding is expected
 ### Sparse Autoencoder
 
 The sparse autoencoder imposes a sparsity constraint on the latent code.
-Each element in the latent code should only be active with a probability $$p$$.
+Each element in the latent code should only be active with a probability $p$.
 We add the following auxiliary loss to enforce it while training:
 
 $$L_s(z) = \sum_{i=1}^N \left( p \cdot \log{\frac{p}{\bar{z}^{(i)}}} + (1 - p) \cdot \log{\frac{1 - p}{1 - \bar{z}^{(i)}}} \right)$$
 
-where $$\bar{z}^{(i)}$$ is the average activation of the $$i$$th element of the latent code over a batch.
-This loss corresponds to the sum of $$|z|$$ Kulback-Leibler divergences between binomial distributions with the means $p$ and $\bar{z}^{(i)}$.
+where $\bar{z}^{(i)}$ is the average activation of the $i$th element of the latent code over a batch.
+This loss corresponds to the sum of $|z|$ Kulback-Leibler divergences between binomial distributions with the means $p$ and $\bar{z}^{(i)}$.
 Other implementations may be possible to enforce the sparsity constraint, too.
 
-To make this sparsity loss possible, we have to scale the latent code to $$[0, 1]$$ in order to be interpreted as probabilities.
+To make this sparsity loss possible, we have to scale the latent code to $[0, 1]$ in order to be interpreted as probabilities.
 This is done with a sigmoid activation function which gives us following reconstruction formula:
 
 $$\hat{x} = \operatorname{dec}(\sigma(\operatorname{enc}(x)))$$
 
-The complete loss for the sparse autoencoder combines the reconstruction loss and sparsity loss with an influence hyperparameter $$\beta$$:
+The complete loss for the sparse autoencoder combines the reconstruction loss and sparsity loss with an influence hyperparameter $\beta$:
 
 $$L = L_r + \beta L_s$$
 
-We will set $$p$$ to 0.25 and $$\beta$$ to one for all experiments.
+We will set $p$ to 0.25 and $\beta$ to one for all experiments.
 
 ### Denoising Autoencoder
 
@@ -155,7 +156,7 @@ Instead of feeding the input data straight to the network, we add Gaussian noise
 
 $$x' = \operatorname{clip} (x + \mathcal{N}(0;\operatorname{diag}(\beta\mathbf{I}))) $$
 
-where $$\operatorname{clip}$$ is clipping its input to $$[0, 1]$$ and the scalar $$\beta$$ is the variance of the noise.
+where $\operatorname{clip}$ is clipping its input to $[0, 1]$ and the scalar $\beta$ is the variance of the noise.
 Hence, the autoencoder is trained on reconstructing clean samples from a noisy version.
 The reconstruction formula is:
 
@@ -164,7 +165,7 @@ $$\hat{x} = \operatorname{dec}(\operatorname{enc}(x'))$$
 We use the noisy input exclusively in training.
 When evaluating the autoencoder, we feed it the original input data.
 Otherwise, the denoising autoencoder uses the same loss function as the ones before.
-For all experiments, $$\beta$$ is set to 0.5.
+For all experiments, $\beta$ is set to 0.5.
 
 ### Variational Autoencoder
 
@@ -173,20 +174,20 @@ In practice, the implementation and training are very similar.
 The VAE interprets the reconstruction as a stochastic process, making it non-deterministic.
 The encoder does not output the latent code, but the parameters of a probability distribution of latent codes.
 The decoder then receives a sample from this distribution.
-The default choice of distribution family is a Gaussian $$\mathcal{N}(\mu; \operatorname{diag}(\Sigma))$$.
+The default choice of distribution family is a Gaussian $\mathcal{N}(\mu; \operatorname{diag}(\Sigma))$.
 The reconstruction formula looks as follows:
 
-$$\hat{x} = \operatorname{dec}(\operatorname{sample}(\operatorname{enc}_\mu(x), \operatorname{enc}_\Sigma(x)))$$
+$$\hat{x} = \operatorname{dec}(\operatorname{sample}(\operatorname{enc}\_\mu(x), \operatorname{enc}\_\Sigma(x)))$$
 
-where $$\operatorname{enc}_\mu(x)$$ and $$\operatorname{enc}_\Sigma(x)$$ encode $$x$$ to $$\mu$$ and $$\Sigma$$.
+where $\operatorname{enc}\_\mu(x)$ and $\operatorname{enc}\_\Sigma(x)$ encode $x$ to $\mu$ and $\Sigma$.
 Both encoders share most of their parameters.
 In practice, a single encoder simply gets two output layers instead of one.
 The problem is now that sampling from a distribution is an operation without gradient and backpropagation from the decoder to the encoder would be impossible.
-The solution is called the reparametrization trick and transforms a sample from a standard Gaussian to one from a Gaussian parametrized by $$\mu$$ and $$\Sigma$$:
+The solution is called the reparametrization trick and transforms a sample from a standard Gaussian to one from a Gaussian parametrized by $\mu$ and $\Sigma$:
 
 $$\operatorname{reparametrize}(\mu, \Sigma) = \Sigma \cdot \operatorname{sample}(0, \operatorname{diag}(\mathbf{I})) + \mu$$
 
-This formulation has a gradient with respect to $$\mu$$ and $$\Sigma$$ and makes training with backpropagation possible.
+This formulation has a gradient with respect to $\mu$ and $\Sigma$ and makes training with backpropagation possible.
 
 The variational autoencoder further restricts the latent space by requiring Gaussian distributions to be similar to a standard Gaussian.
 The distribution parameters are therefore penalized with the Kulback-Leibler divergence:
@@ -210,15 +211,15 @@ If you want to understand the theory behind VAEs, I recommend the [tutorial](htt
 ### Beta Variational Autoencoder
 
 The beta VAE is a generalization of the VAE that simply changes the ratio between reconstruction and divergence loss.
-The influence of the divergence loss is parametrized by a scalar $$\beta$$, hence the name:
+The influence of the divergence loss is parametrized by a scalar $\beta$, hence the name:
 
 $$L = L_r + \beta L_{KL}$$
 
-A $$\beta < 1$$ relaxes the constraints on the latent space while a $$\beta > 1$$ makes the constraint stricter.
+A $\beta < 1$ relaxes the constraints on the latent space while a $\beta > 1$ makes the constraint stricter.
 The former should result in better reconstructions and the latter in better unconditional sampling.
 The theoretic derivation makes good arguments about what else this simple change affects.
 You can read them on [OpenReview](https://openreview.net/pdf?id=Sy2fzU9gl).
-We will use a strict version of this autoencoder with $$\beta = 2$$ and a loose version with $$\beta = 0.5$$.
+We will use a strict version of this autoencoder with $\beta = 2$ and a loose version with $\beta = 0.5$.
 
 ### Vector-Quantized Variational Autoencoder
 
@@ -232,18 +233,18 @@ The categories themselves are learned by minimizing the sum squared error to the
 
 $$L_{vq} = \frac{1}{N}\sum_{i=1}^N \sum_{j=1}^{|z|} (\operatorname{sg}(z_j^{(i)}) - \hat{z}_j^{(i)})^2$$
 
-where $$z$$ is the output of the encoder, $$\hat{z}$$ is the corresponding quantized latent code, and $$sg$$ the stop gradient operator.
+where $z$ is the output of the encoder, $\hat{z}$ is the corresponding quantized latent code, and $sg$ the stop gradient operator.
 On the other hand, the encoder is encouraged to output encodings similar to the categories by sum squared error, too:
 
 $$L_{c} = \frac{1}{N}\sum_{i=1}^N \sum_{j=1}^{|z|} (z_j^{(i)} - \operatorname{sg}(\hat{z}_j^{(i)}))^2$$ 
 
 This is called the commitment loss.
 A Kulback-Leibler divergence loss is not necessary, as the divergence would be a constant for a uniform categorical distribution.
-Both losses are combined with the reconstruction loss by a hyperparameter $$\beta$$ controlling the influence of the commitment loss:
+Both losses are combined with the reconstruction loss by a hyperparameter $\beta$ controlling the influence of the commitment loss:
 
 $$L = L_r + L_{vq} + \beta L_c$$
 
-We set $$\beta$$ to one for all experiments.
+We set $\beta$ to one for all experiments.
 
 Because the vq-VAE is a generative model, we can sample from it unconditionally, too.
 In the original paper, a pixel-CNN is used to autoregressively sample a latent code.
@@ -282,13 +283,13 @@ Who knows what background process is hogging resources at any given time?
 First and foremost, we want to see how well each autoencoder can reconstruct its input.
 For this, we can have a look at the 16 first images of the MNIST test set.
 
-|shallow|vanilla|stacked|sparse|denoising|
-|:-----:|:-----:|:-----:|:----:|:-------:|
-|<img alt="Shallow AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/shallow.jpeg" style="max-width:unset;"/>| <img alt="Vanilla AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vanilla.jpeg" style="max-width:unset;"/>| <img alt="Stacked AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/stacked.jpeg" style="max-width:unset;"/>|<img alt="Sparse AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/sparse.jpeg" style="max-width:unset;"/>|   <img alt="Denoising AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/denoising.jpeg" style="max-width:unset;"/>|
+|                                                                           shallow                                                                           |                                                                           vanilla                                                                           |                                                                           stacked                                                                           |                                                                          sparse                                                                           |                                                                            denoising                                                                            |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="Shallow AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/shallow.jpeg" >}} | {{< img alt="Vanilla AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vanilla.jpeg" >}} | {{< img alt="Stacked AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/stacked.jpeg" >}} | {{< img alt="Sparse AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/sparse.jpeg" >}} | {{< img alt="Denoising AE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/denoising.jpeg" >}} |
 
-| vae  |beta_vae_strict|beta_vae_loose|  vq  |
-|:----:|:-------------:|:------------:|:----:|
-|<img alt="VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vae.jpeg" style="max-width:unset;"/>|         <img alt="Strict beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/beta_vae_strict.jpeg" style="max-width:unset;"/>|<img alt="Loose beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vq.jpeg" style="max-width:unset;"/>|
+|                                                                       vae                                                                        |                                                                             beta_vae_strict                                                                              |                                                                             beta_vae_loose                                                                             |                                                                         vq                                                                         |
+|:------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vae.jpeg" >}} | {{< img alt="Strict beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/beta_vae_strict.jpeg" >}} | {{< img alt="Loose beta-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/beta_vae_loose.jpeg" >}} | {{< img alt="vq-VAE Reconstructions" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/reconstructions/vq.jpeg" >}} |
 
 The shallow autoencoder fails to reconstruct many of the test samples correctly.
 Fours and nines are barely distinguishable, and some digits are not recognizable at all.
@@ -302,13 +303,13 @@ Otherwise, there is little difference to be seen between the different autoencod
 This is supported by the reconstruction errors over the whole test set.
 The table below lists the summed binary cross-entropy averaged over the samples of the set.
 
-|shallow|vanilla|stacked|sparse|denoising|
-|:-----:|:-----:|:-----:|:----:|:-------:|
-|  123.2|  63.92|  87.87| 64.27|    75.15|
+| shallow | vanilla | stacked | sparse | denoising |
+|:-------:|:-------:|:-------:|:------:|:---------:|
+|  123.2  |  63.92  |  87.87  | 64.27  |   75.15   |
 
-| vae |beta_vae_strict|beta_vae_loose| vq  |
-|:----:|:-------------:|:------------:|:----:|
-|76.12|          86.12|         69.51|64.49|
+|  vae  | beta_vae_strict | beta_vae_loose |  vq   |
+|:-----:|:---------------:|:--------------:|:-----:|
+| 76.12 |      86.12      |     69.51      | 64.49 |
 
 Trailing far behind, as suspected, is the shallow autoencoder.
 It simply lacks the capacity to capture the structure of MNIST.
@@ -326,13 +327,13 @@ For each of them, we sample 16 latent codes and decode them.
 For the VAE and beta-VAEs, we sample from a standard Gaussian.
 The latent codes for the vq-VAE will be sampled uniformly from their learned categories.
 
-| vae  |beta_vae_strict|
-|:----:|:-------------:|
-|<img alt="VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/vae.jpeg" style="max-width:unset;"/>|<img alt="Strict beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/beta_vae_strict.jpeg" style="max-width:unset;"/>
+|                                                               vae                                                                |                                                                     beta_vae_strict                                                                      |
+|:--------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/vae.jpeg" >}} | {{< img alt="Strict beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/beta_vae_strict.jpeg" >}} |
 
-|beta_vae_loose|  vq  |
-|:------------:|:----:|
-|<img alt="Loose beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/beta_vae_loose.jpeg" style="max-width:unset;"/>|<img alt="vq-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/vq.jpeg" style="max-width:unset;"/>|
+|                                                                     beta_vae_loose                                                                     |                                                                 vq                                                                 |
+|:------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="Loose beta-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/beta_vae_loose.jpeg" >}} | {{< img alt="vq-VAE Samples" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/samples/vq.jpeg" >}} |
 
 None of them look pretty, but we can glance at some differences, nonetheless.
 The most meaningful samples were generated by the strict beta-VAE.
@@ -361,17 +362,17 @@ For all VAE types, we interpolate before the bottleneck operation.
 This means that we interpolate the Gaussian parameters and then sample from them for the VAE and beta-VAE.
 For the vq-VAE, we first interpolate and then quantize.
 
-|shallow|vanilla|stacked|
-|:-----:|:-----:|:-----:|
-|<img alt="Shallow Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/shallow.gif" style="max-width:unset;width:64px;"/>|<img alt="Vanilla Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vanilla.gif" style="max-width:unset;width:64px;"/>|<img alt="Stacked Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/stacked.gif" style="max-width:unset;width:64px;"/>|
+|                                                                             shallow                                                                             |                                                                             vanilla                                                                             |                                                                             stacked                                                                              |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="Shallow Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/shallow.gif" width="64px">}} | {{<img alt="Vanilla Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vanilla.gif" width="64px" >}} | {{< img alt="Stacked Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/stacked.gif" width="64px" >}} |
 
-|sparse|denoising| vae |
-|:----:|:-------:|:---:|
-|<img alt="Sparse Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/sparse.gif" style="max-width:unset;width:64px;"/>|<img alt="Denoising Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/denoising.gif" style="max-width:unset;width:64px;"/>|<img alt="VAE Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vae.gif" style="max-width:unset;width:64px;"/>|
+|                                                                             sparse                                                                             |                                                                              denoising                                                                               |                                                                           vae                                                                            |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="Sparse Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/sparse.gif" width="64px" >}} | {{< img alt="Denoising Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/denoising.gif" width="64px" >}} | {{< img alt="VAE Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vae.gif" width="64px" >}} |
 
-|beta_strict|beta_loose| vq  |
-|:-------------:|:------------:|:---:|
-|<img alt="Beta Strict Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/beta_vae_strict.gif" style="max-width:unset;width:64px;"/>|<img alt="Beta Loose Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/beta_vae_loose.gif" style="max-width:unset;width:64px;"/>|<img alt="VQ Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vq.gif" style="max-width:unset;width:64px;"/>|
+|                                                                                 beta_strict                                                                                  |                                                                                 beta_loose                                                                                 |                                                                           vq                                                                           |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| {{< img alt="Beta Strict Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/beta_vae_strict.gif" width="64px" >}} | {{< img alt="Beta Loose Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/beta_vae_loose.gif" width="64px" >}} | {{< img alt="VQ Interpolation" src="https://raw.githubusercontent.com/tilman151/ae_bakeoff/master/results/mnist/interpolation/vq.gif" width="64px" >}} |
 
 Above you can see GIFs looping through the interpolated images back and forth, briefly stopping at the original images.
 We can see that the VAE and beta-VAEs produce relatively meaningful interpolations, going from a two over something looking threeish to a seven.
@@ -429,16 +430,16 @@ Let's take a look at how we can leverage this finding for classifying the MNIST 
 We will use the 20-dimensional latent codes from our trained autoencoders and fit a dense classification layer on it.
 The layer will be trained on only 550 labeled samples of the training set against cross-entropy.
 In other words, we are using our autoencoders for semi-supervised learning.
-For comparison, training the vanilla encoder plus classification layer from scratch yields an accuracy of $$0.4364$$.
+For comparison, training the vanilla encoder plus classification layer from scratch yields an accuracy of $0.4364$.
 We will see if our autoencoders can improve on that in the table below.
 
-|shallow|vanilla|stacked|sparse|denoising|
-|:-----:|:-----:|:-----:|:----:|:-------:|
-| 0.4511| 0.7835| 0.6107|0.2221|   0.8049|
+| shallow | vanilla | stacked | sparse | denoising |
+|:-------:|:-------:|:-------:|:------:|:---------:|
+| 0.4511  | 0.7835  | 0.6107  | 0.2221 |  0.8049   |
 
-| vae  |beta_vae_strict|beta_vae_loose|  vq  |
-|:----:|:-------------:|:------------:|:----:|
-|0.6016|         0.4536|        0.6311|0.7717|
+|  vae   | beta_vae_strict | beta_vae_loose |   vq   |
+|:------:|:---------------:|:--------------:|:------:|
+| 0.6016 |     0.4536      |     0.6311     | 0.7717 |
 
 Unsurprisingly, nearly all autoencoders improved on the baseline, with the sparse one being the exception.
 The denoising autoencoder takes the first place, closely followed by the vanilla autoencoder and vq-VAE.
@@ -480,7 +481,7 @@ We will leave this problem for someone else to solve (as most publications do, t
 
 The results of this last task came as a bit of a surprise for me.
 I did some digging for bugs, but I am sure now that they are valid.
-The shallow autoencoder leaves all other autoencoders in the dust with a whooping $$0.91$$ AUC.
+The shallow autoencoder leaves all other autoencoders in the dust with a whooping $0.91$ AUC.
 Up next would be the stacked autoencoder with a narrow field of the remaining ones behind it.
 This order is stable for different digits and dimensions of the latent space, too.
 
