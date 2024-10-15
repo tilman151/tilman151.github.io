@@ -6,7 +6,7 @@ theme: "PaperMod"
 params:
     homeInfoParams:
         Title: Hi, I'm Tilman
-        Content: Ph.D. student of deep learning at TU Berlin. On this personal blog I will write about deep learning and coding topics that keep me up at night. Obviously there will be updates on my ongoing research, too.
+        Content: Machine Learning Engineer with a passion for software engineering. On this personal blog I will write about machine learning and coding topics that keep me up at night.
 
     DateFormat: "2 January 2006"
         
