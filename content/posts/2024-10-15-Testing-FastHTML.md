@@ -372,6 +372,18 @@ poe setup_e2e  # installs chromium, ollama, and pulls the LLM
 poe e2e
 ```
 
+## Running Automatically
+
+Automated tests are most useful, when they're triggered to run automatically.
+Including them in pipelines offered by services like GitHub Actions or GitLab CI is standard practice for many teams.
+You can find an example pipeline for GitHub Actions [here](https://github.com/tilman151/testing-fasthtml/blob/main/.github/workflows/on_push.yaml).
+It is configured to run the unit, integration, and end-to-end tests in this order on every push to the main branch.
+The latter types of tests are only run if the former pass, which saves time and costs.
+
+It is best practice to cache dependencies in these pipelines.
+Not only does this speed up the pipeline execution, it alleviates the load on the package repositories which are often maintained by non-profit organizations.
+In our case, we cache the Python dependencies, the LLM model files, and the Playwright browser binaries.
+
 ## Conclusion
 
 Automated testing is essential for developing software.
