@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Testing on Don't Repeat Yourself</title><link>https://tilman151.github.io/tags/testing/</link><description>Recent content in Testing on Don't Repeat Yourself</description><generator>Hugo -- 0.136.5</generator><language>en-us</language><lastBuildDate>Tue, 15 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://tilman151.github.io/tags/testing/index.xml" rel="self" type="application/rss+xml"/><item><title>Testing FastHTML Dashboards</title><link>https://tilman151.github.io/posts/testing-fasthtml/</link><pubDate>Tue, 15 Oct 2024 00:00:00 +0000</pubDate><guid>https://tilman151.github.io/posts/testing-fasthtml/</guid><description>&lt;p>Building dashboards to visualize data or the results of experiments is the bread and butter of data people (read: data scientist, engineers, analysts, etc.).
+Often, these dashboards are hacked together in record time to meet a presentation deadline.
+Now imagine this: you built a dashboard for showcasing your latest model to your team.
+Instead of your go-to tool, &lt;a href="https://streamlit.io/">Streamlit&lt;/a>, you decided to try out &lt;a href="https://fastht.ml">FastHTML&lt;/a>, a shiny new framework that promises better handling and scalability if your dashboard ever needs to go bigger.
+Your team lead is so impressed with your model that they want to show it to the whole company.
+That is your chance to shine!
+With FastHTML, you don&amp;rsquo;t have to worry about scaling to a bigger audience.
+But wait: are you sure your dashboard is really working as expected?
+How can you be certain nothing fails if the CEO happens to use it?
+Normally, you would go for automated testing, but after scouring the FastHTML documentation on how to do it, you found nothing.&lt;/p></description></item></channel></rss>
