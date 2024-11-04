@@ -195,6 +195,10 @@ poe unit
 
 ### Integration Tests for the Routes
 
+*UPDATE: in a previous version of this article, the integration tests made use of regexes.
+This was brittle and did a poor job of conveying the test's intent.
+Thanks to Jeremy Howard's feedback, the tests now use the much more suitable XPath functionality of the lxml package.*
+
 Next, we will test if sending requests to the routes of our dashboard works as expected.
 We will use the `starlette.testclient.TestClient` for this.
 It allows us to simulate HTTP requests to our dashboard without spinning up a server.
@@ -238,9 +242,9 @@ def test_ask_mocked_answer(client, mocker):
     response = client.post("/ask", data={"question": "question0"})
 
     assert response.status_code == 200
-    html = htmlmin.minify(response.text, remove_empty_space=True)
-    assert '<input name="question" value="question0" disabled>' in html
-    assert '<input name="answer" value="answer0" disabled>' in html
+    html = lxml.html.fromstring(response.text)
+    assert html.xpath("//input[@name='question' and @disabled and @value='question0']")
+    assert html.xpath("//input[@name='answer' and @disabled and @value='answer0']")
 ```
 
 The most important part of this test is the `mocker` fixture.
@@ -250,8 +254,9 @@ Additionally, the response of an LLM is not deterministic, making it hard to tes
 
 The test now sends a POST request to the `/ask` route with the question.
 The response is then checked for the appropriate status code and the expected HTML fragment.
-We use the `htmlmin` package to remove unnecessary whitespaces and linebreaks from the response text.
-This makes the checks more robust against minor changes in the HTML structure.
+We parse the fragment with the help of `lxml` to run XPath queries against it.
+[XPath](https://en.wikipedia.org/wiki/XPath) is a query language for selecting nodes in an XML/HTML document.
+In our case, we use it to check if the input fields contain the expected values and are disabled.
 
 Next, we will look at a test for the `/history` route:
 
@@ -260,16 +265,17 @@ def test_history_empty(client):
     response = client.get("/history")
 
     assert response.status_code == 200
-    html = htmlmin.minify(response.text, remove_empty_space=True)
-    assert re.search("<table>.+?</table>", html)
-    assert "<thead><tr><th>Question</th><th>Asked at</th></tr></thead>" in html
-    assert "<tbody hx-target=#question-form></tbody>" in html
+    html = lxml.html.fromstring(response.text)
+    assert html.xpath("//table")
+    assert html.xpath("//table/thead/tr/th[text()='Question']")
+    assert html.xpath("//table/thead/tr/th[text()='Asked at']")
+    assert len(html.xpath("//table/tbody/tr")) == 0
 ```
 
 This test sends a GET request to retrieve the table of the last ten questions.
 In this case, there are no questions in the database, so the table should be empty.
-We check if the returned fragment is still a table with the correct headers and an empty body.
-To do so, we use a regex to check for a non-empty table tag.
+We check if the returned fragment is still a table with the correct headers.
+Additionally, we check if the table body is empty by asserting that an XPath query for table rows returns no results.
 
 You can find the `test_app` module with all integration tests [here](https://github.com/tilman151/testing-fasthtml/blob/main/tests/test_app.py).
 They are marked with the `integration` marker, so you can run them with the following command:
@@ -278,10 +284,9 @@ They are marked with the `integration` marker, so you can run them with the foll
 poe integration
 ```
 
-Overall, I am still unsatisfied with the integration tests.
-Using `in` operators and regexes to check the HTML fragments is not very elegant.
-The alternative of checking against the whole expected HTML fails to properly convey the intent of the test.
-If I ever come up with a better solution, I will update the post and the repository.
+XPath queries offer a concise way to check the rendered HTML, but aren't the easiest to write.
+Fortunately, coding assistants, like GitHub Copilot, are proficient at generating XPaths from natural language.
+For integration tests, using XPaths is preferable over regexes or string comparisons, as they're more robust and easier to read.
 
 ### End-to-End Tests for the Dashboard
 
