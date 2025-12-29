@@ -12,11 +12,11 @@ params:
         
     socialIcons:
         - name: email
-          url: "mailto:tilman.krokotsch@tu-berlin.de"
+          url: "mailto:blog(at)krokotsch.eu"
         - name: github
           url: "https://github.com/tilman151"
         - name: linkedin
-          url: "https://www.linkedin.com/in/tilman-krokotsch-51a335152"
+          url: "https://www.linkedin.com/in/tilman-krokotsch"
 
 
     assets:
