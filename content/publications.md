@@ -28,3 +28,13 @@ In *2020 IEEE International Conference on Prognostics and Health Management (ICP
 Krokotsch, T., Knaak, M., & Gühmann, C. (2022).
 **Improving Semi-Supervised Learning for Remaining Useful Lifetime Estimation Through Self-Supervision.**
 *International Journal of Prognostics and Health Management*, 13(1).
+
+### 2025
+
+Krokotsch, T., Ragab, M., Wu, M., Li, X., Chen, Z., & Gühmann, C. (2025).
+**From Inconsistency to Unity: Benchmarking Deep Learning-Based Unsupervised Domain Adaptation for RUL.**
+*IEEE Transactions on Automation Science and Engineering*
+
+Krokotsch, T. (2025).
+**Methods for proper evaluation of unsupervised domain adaptation for remaining useful life estimation.**
+*PhD Thesis*
