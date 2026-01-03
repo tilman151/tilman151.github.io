@@ -1,49 +1,98 @@
 <style>
-    #cookie-notice {padding: 1.5rem 1rem; display: none; text-align: center; position: fixed; bottom: 0; width: 100%; background: var(--border); color: var(--primary);}
-    #cookie-notice a {display: inline-block; cursor: pointer; margin-left: 1rem;}
-    @media (max-width: 767px) {
-        #cookie-notice span {display: block; padding-top: 3px; margin-bottom: 1rem;}
-        #cookie-notice a {position: relative; bottom: 4px;}
+    #cookie-notice {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 600px;
+        padding: 1rem;
+        display: none;
+        background: var(--entry);
+        color: var(--primary);
+        border-radius: var(--radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000;
+        text-align: center;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    #cookie-notice span {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    .cookie-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    #cookie-notice a {
+        padding: 0.4rem 0.8rem;
+        border-radius: var(--radius);
+        background: var(--tertiary);
+        color: var(--primary);
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    #cookie-notice a:hover {
+        background: var(--secondary);
+        color: var(--theme);
+    }
+    @media (min-width: 600px) {
+        #cookie-notice {
+            display: none; /* Initial display state handled by JS */
+            flex-direction: row;
+            text-align: left;
+        }
+    }
+    @media (max-width: 599px) {
+        #cookie-notice {
+            flex-direction: column;
+            bottom: 10px;
+        }
     }
 </style>
-<div id="cookie-notice"><span>I am using third-party cookies to count readers. If you don't want to be counted, please use incognito mode.</span><a id="cookie-notice-accept" class="btn btn-primary btn-sm">OK</a><a href="/privacy" class="btn btn-primary btn-sm">More info</a></div>
+<div id="cookie-notice">
+    <span>I am using third-party cookies to count readers. If you're fine with this, click OK.</span>
+    <div class="cookie-buttons">
+        <a id="cookie-notice-accept">OK</a>
+        <a href="/privacy">More info</a>
+    </div>
+</div>
 <script>
-    function createCookie(name,value,days) {
-        var expires = "";
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days*24*60*60*1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + value + expires + "; path=/";
-    }
-    function readCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-        }
-        return null;
-    }
-    function eraseCookie(name) {
-        createCookie(name,"",-1);
-    }
+    (function() {
+        const cookieName = 'cookie-notice-dismissed';
 
-    if(readCookie('cookie-notice-dismissed')=='true') {
-        var clicky_site_ids = clicky_site_ids || []; clicky_site_ids.push(101271854);
-        var s = document.createElement('script');
-        s.src = "https://static.getclicky.com/js"
-        document.head.appendChild(s)
-    } else {
-        document.getElementById('cookie-notice').style.display = 'block';
-    }
-    document.getElementById('cookie-notice-accept').addEventListener("click",function() {
-        createCookie('cookie-notice-dismissed','true',31);
-        document.getElementById('cookie-notice').style.display = 'none';
-        location.reload();
-    });
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                const c = ca[i].trim();
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        if (getCookie(cookieName) === 'true') {
+            const s = document.createElement('script');
+            s.async = true;
+            s.dataset.id = '101271854';
+            s.src = "//static.getclicky.com/js";
+            document.head.appendChild(s);
+        } else {
+            const notice = document.getElementById('cookie-notice');
+            notice.style.display = 'flex';
+            document.getElementById('cookie-notice-accept').addEventListener("click", function() {
+                const date = new Date();
+                date.setTime(date.getTime() + (31 * 24 * 60 * 60 * 1000));
+                document.cookie = cookieName + "=true; expires=" + date.toUTCString() + "; path=/; SameSite=Lax";
+                notice.style.display = 'none';
+                location.reload();
+            });
+        }
+    })();
 </script>
 
 
