@@ -1,0 +1,27 @@
+details {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--code-bg);
+}
+
+details[open] {
+    padding-bottom: 1rem;
+}
+
+summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.5rem 0;
+    outline: none;
+}
+
+details[open] summary {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+}
+
+summary::-webkit-details-marker {
+    color: var(--secondary);
+}
