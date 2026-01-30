@@ -5,7 +5,61 @@
 {{ if .Store.Get "hasMermaid" }}
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true });
+    
+    const getTheme = () => {
+      return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'neutral';
+    };
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: getTheme(),
+    });
+
+    // Store original content of mermaid blocks to allow re-rendering
+    const storeOriginalContent = () => {
+      document.querySelectorAll('.mermaid').forEach((el) => {
+        if (!el.getAttribute('data-original-content')) {
+          el.setAttribute('data-original-content', el.innerHTML);
+        }
+      });
+      mermaid.run({
+        querySelector: '.mermaid',
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', storeOriginalContent);
+    } else {
+      storeOriginalContent();
+    }
+
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        // PaperMod's footer.html script runs first and toggles data-theme
+        // We use setTimeout to ensure we get the updated value
+        setTimeout(() => {
+          const newTheme = getTheme();
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: newTheme,
+          });
+          // Re-render all mermaid diagrams
+          // We need to restore original content and remove data-processed attribute
+          document.querySelectorAll('.mermaid').forEach((el) => {
+            if (el.getAttribute('data-processed')) {
+              el.removeAttribute('data-processed');
+              if (el.getAttribute('data-original-content')) {
+                el.innerHTML = el.getAttribute('data-original-content');
+              }
+            }
+          });
+          mermaid.run({
+            querySelector: '.mermaid',
+          });
+        }, 0);
+      });
+    }
   </script>
 {{ end }}
 {{- /* Head custom content area end */ -}}
