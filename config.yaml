@@ -34,3 +34,9 @@ menu:
       name: Publications
       url: /publications/
       weight: 10
+
+markup:
+  defaultMarkdownHandler: goldmark
+  goldmark:
+    extensions:
+      footnote: true
