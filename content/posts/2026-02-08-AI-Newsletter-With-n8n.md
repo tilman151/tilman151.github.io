@@ -1,30 +1,24 @@
 ---
-title: "N8N AI Agent"
-date: 2026-01-25T20:14:55+01:00
-draft: true
+title: "Letting AI Write a Newsletter with n8n"
+slug: "ai-newsletter-with-n8n"
+date: 2026-02-08
+tags: [ai, llm, automation]
+mathjax: false
 ---
-
-To be honest, I am an AI[^1] skeptic.
-Even though it's my job as a data and AI consultant to build AI-driven solutions for customers, I do not share the hype.
-The problem is not the technology itself[^2], but the way people and businesses approach it.
-They see AI as this technological marvel, the solution for all their problems, without even knowing what these problems are exactly.
-More often than not, AI projects are done out of vanity to proudly declare on LinkedIn that they, too, are an AI company.
-Frequently, the problem to solve is ill-defined, and sometimes the best solution does not involve AI at all.
-
-Nevertheless, AI has its uses and lets us build and automate things we didn't even dream of a few years back.
-I wanted to solve a real problem with AI as an exercise and see how much value it brings.
-Being a personal project, I had total control and wanted to enforce one more constraint: being as digitally independent as possible.
-This means, no US hyperscalers for infrastructure and no US LLM providers.
-As a European, I wanted to check just how challenging things would get if we got cut off from these companies[^3].
-Given these constraints, I had the perfect problem.
 
 I’ve been a member of an orchestra in my hometown since childhood.
 Although I only get to play my chosen instrument a few times each year, I'm still active in the orchestra's board.
-Due to my profession, most tasks that can be done digitally fall into my domain, such as the problem at hand: writting the weekly newsletter.
+Due to my profession, most things that can be done digitally fall into my domain.
+I do not particularly enjoy these administrative tasks, but somebody has to do them.
+One of these tasks is especially bothersome: _writing the weekly newsletter_.
 This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks.
-The newsletter is also cross-posted into the orchestra's WhatsApp[^4] group chat.
+The newsletter is also cross-posted into the orchestra's WhatsApp group chat.
 Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs.
-You can see the weekly process in the flowchart below.
+
+I was thinking about automating this task for a long time[^1].
+There were ideas of pre-formulated text fragments that could be dynamically stitched together, but it never seemed particularly promising.
+Now, we are living in the era of AI automation and if AI[^2] can do anything well, it is parsing unstructured data and writing prose.
+It seemed the best time to give in to my automation desires and replace the process you can see below.
 
 ```mermaid
 flowchart TD
@@ -64,7 +58,7 @@ flowchart TD
 A lot of this process is inactive time, waiting for others to reply.
 The active tasks ordered by effort needed and time consumed are:
 
-1. **Checking for completeness:** verifying that all information for compiling the newsletter is available needs concentration and is error-prone. More often than not, I notice that something is missing while writing the newsletter text.
+1. **Checking for completeness:** verifying that all information for compiling the newsletter is available needs concentration and is error-prone. More often than not, I first notice that something is missing while already writing the newsletter text.
 2. **Writing the newsletter:** compiling the collected information into continuous text takes the most time.
 3. **Looking up information:** cross-referencing the calendar, messages, and information from the internet is especially hard when on mobile. Multitasking on a smartphone is more than annoying.
 
@@ -84,7 +78,6 @@ Next, I needed to decide on a platform to orchestrate my automation with.
 
 The platform I hear a lot about these days on LinkedIn and daily.dev ist [n8n](https://n8n.io).
 It is a fair-code[^5] automation platform with builtin AI capabilities and a lot of integrations for various services.
-Luckily, n8n is a German unicorn startup, which makes it perfect for my digital independence constraint.
 Self-hosting is free and simple, as well, with pre-built Docker images.
 Using the [docs](https://docs.n8n.io/hosting/installation/docker), I came up with this Docker compose file:
 
@@ -151,7 +144,7 @@ At last, the packages needed to be added to an allowlist by modifying the defaul
 			// ...
 			"env-overrides": {
                 // ...
-				"N8N_RUNNERS_STDLIB_ALLOW": "json,datetime,time",
+				"N8N_RUNNERS_STDLIB_ALLOW": "json,datetime,time,re",
 				"N8N_RUNNERS_EXTERNAL_ALLOW": "icalevents,pytz"
 			}
 		}
@@ -186,8 +179,8 @@ Even several additional hours of bug fixing did not solve the issue, so I resign
 {{< /collapse >}}
 
 After failing miserably to acquire WhatsApp credentials, I needed another chat provider.
-My collaborators were unwilling to migrate away from WhatsApp, so the chatbot will have to communicate with me on another platform, and I will forward the messages.
-This prevents my previous idea of full automation, but copying some messages would still be less work than before.
+My collaborators were unwilling to migrate away from WhatsApp, so the chatbot would have to communicate with me on another platform, and I'd forward the messages.
+This prevented my previous idea of full automation, but copying some messages would still be less work than before.
 
 For personal communication, I try to use Signal as much as possible because it is free, open-source, and end-to-end encrypted.
 Unfortunately, Signal does not have an official bot API, and the inofficial ones seemed finicky to set up.
@@ -200,7 +193,7 @@ The `@botfather` asks for your bot's display name and handle and supplies an API
 That's it!
 
 Now I had one last issue to fix.
-Given the n8n setup above, the instance could send messages but not receive it, as all incoming traffic is blocked by nginx.
+Given the n8n setup above, the instance could send messages but not receive it, as all incoming traffic was blocked by nginx.
 I still wanted to avoid revealing the instance to the open web, so I used the following addition to my nginx config:
 
 ```nginx
@@ -242,12 +235,12 @@ The events need to be sourced from the orchestra's public Google calendar.
 
 This part of the workflow is triggered by a _Schedule Trigger_ set to 10:00 each Monday.
 I didn't want to connect my personal Google account to n8n, so I opted for reading the calendar as an ICS file.
-Unfortunately, there is no builtin parser node, and I didn't want to bother with installing community nodes, so I used the _Code Node_ to execute a Python script:
+Unfortunately, the builtin parser node failed me, and I didn't want to bother with installing community nodes, so I used the _Code Node_ to execute a Python script:
 
 ```python
 import datetime
 
-import icalevents.icalevents
+from icalevents.icalevents import events
 import pytz
 
 calendar_id = "<calendar_id>"
@@ -255,7 +248,7 @@ ics_url = f"https://calendar.google.com/calendar/ical/{calendar_id}/public/basic
 tz = pytz.timezone("Europe/Berlin")
 now = datetime.datetime.fromisoformat(_items[0]["json"]["timestamp"])
 end_date = now + datetime.timedelta(days=7)
-cal = icalevents.icalevents.events(ics_url, end=end_date, sort=True)
+cal = events(ics_url, end=end_date, sort=True)
 
 return [
   {
@@ -272,30 +265,29 @@ The script takes the timestamp from the trigger node and fetches the calendar ev
 It then converts the events into a list of dictionaries.
 The start and end timestamps of each event are converted to weekday and time, because this is how they should be formatted in the prompt.
 
-Each event is now a workflow item, which would be processed separately.
+Each event is now a workflow item, which would be processed separately by the next node.
 But the LLM needs all events at once, so the _Aggregate Node_ merges them into a single item.
 This feeds into an _LLM Chain Node_ whose system prompt boils down to: take these event JSONs and encode them in a paragraph of text.
 Additionally, the system prompt contains instructions on tone and conventions.
 There are, for example, two common rehearsal locations, which should only be referred to as "the theater" and "the school."
-Without this instruction the LLM would write out the whole name of the location each time, which would sound jarring for the reader.
+Without this instruction the LLM wrote out the whole name of the location each time, which would sound jarring for the reader.
 
-I chose [Mistral](https://mistral.ai) as the model provider, mainly because it is European.
-Additionally, they have a free API usage plan, which is more than enough for this project.
+I chose [Mistral](https://mistral.ai) as the model provider, because they have a free API usage plan, which is more than enough for this project.
 The `mistral-small` model proved itself sufficient for generating the prompt and provides low-latency responses.
 At last, the final prompt is sent to my Telegram account so that I can forward it to WhatsApp.
 
 ## Collecting Information from Messages
 
-My collaborators in the group chat are prompted to supply information, so now I needed a way to store their replies.
+My collaborators in the group chat were prompted to supply information, so now I needed a way to store their replies.
 The _Data Table Node_ provides the perfect solution by offering lightweight database tables directly in n8n.
 No external database server needed.
 
 The _Telegram Trigger_ starts this part of the workflow each time a message is received.
 The trigger node supports user ID restrictions so that the bot only reacts to my Telegram account.
 If the message is not a bot command, like `\reset`, it stores the message text in the `messages` data table.
-This way, the messages for the current week can be retrieved by filtering by creation timestamp.
+This way, the messages for the current week can be retrieved by applying a filter on the creation timestamp.
 
-To avoid filling the table with more and more messages, a `Data Table Node` is connected to the _Schedule Trigger_ to delete all messages of the previous week.
+To avoid filling the table with more and more messages, another _Data Table Node_ is connected to the _Schedule Trigger_ to delete all messages of the previous week.
 
 ## Bringing Everything Together
 
@@ -306,13 +298,14 @@ As outlined above, the newsletter needs three types of information:
 3. and the events of the next fews weeks for the outlook.
 
 The messages are already persisted in a data table, so why not store the other pices of information there, too?
-I piped the week's events fetched by the scheduled workflow part into a separate data table.
+First, I piped the current week's events fetched by the scheduled workflow part into a separate data table.
 Then a slightly modified copy of the _Code Node_ fetches the events for the outlook:
 
 ```diff
 import datetime
+import re
 
-import icalevents.icalevents
+from icalevents.icalevents events
 import pytz
 
 calendar_id = "<calendar_id>"
@@ -321,9 +314,9 @@ tz = pytz.timezone("Europe/Berlin")
 now = datetime.datetime.fromisoformat(_items[0]["json"]["timestamp"])
 + start_date = now + datetime.timedelta(days=7)
 + end_date = now + datetime.timedelta(days=38)
-+ cal = icalevents.icalevents.events(ics_url, start=start_date, end=end_date, sort=True)
++ cal = events(ics_url, start=start_date, end=end_date, sort=True)
 - end_date = now + datetime.timedelta(days=7)
-- cal = icalevents.icalevents.events(ics_url, end=end_date, sort=True)
+- cal = events(ics_url, end=end_date, sort=True)
 
 return [
   {
@@ -335,7 +328,7 @@ return [
 -   "end": e.end.strftime("%A %H:%M"),
   }
   for i, e in enumerate(cal)
-+ if not (e.summary == "Probe" or e.summary.startswith("Probe "))
++ if not re.match("^Probe\s?", e.summary)
 ]
 ```
 
@@ -381,7 +374,16 @@ This input was all I needed to make the LLM do its thing.
 ## Compiling the Newsletter
 
 As the context for the LLM was already prepared, a simple _LLM Chain Node_ was enough to do the rest.
-The user prompt template is as follows:
+One may ask why I took this approach to preparing the context and did not go agentic.
+The honest answer is, I am an AI skeptic.
+Even though it's my job as a data and AI consultant to build AI-driven solutions, I do not share the hype.
+The problem is not the technology itself[^3], but the way people and businesses approach it.
+They see it as the solution to all their problems and use it to reinvent things that never needed AI in the first place.
+AI has its uses, but it is surely not modeling clearly defined, unambiguous processes.
+This is why I tend to start with a rigid but deterministic solution and only go agentic if needed.
+
+Anyway, back to the problem at hand.
+The user prompt template for the LLM is as follows:
 
 ```
 Nachrichten:
@@ -399,20 +401,20 @@ Using a short instruction as the system prompt produced the most AI-sounding new
 Again, the LLM was missing guidelines on my personal way of writing and knowledge.
 For example, if there is no other mention of it, the mail should state the default rehearsal time for the youth orchestra before the regular rehearsal.
 
-It is surprisingly hard to spell out instructions for such things, as I do it mostly subconsciously.
-Luckily, I had been writing these mails for nearly ten years, so I had a lot of example data.
-Feeding a few representative newsletters from the previous year to the Mistral chat produced suitable guidelines on the structure of the newsletter, tone, commonly used phrases, and important information to always include.
-I then added some personal knowledge manually and prohibited the use of Markdown.
+It is surprisingly hard to spell out instructions for such things, as I do it subconsciously.
+Luckily, I had been writing these mails for a _long_ time, so I had a lot of example data.
+Feeding a few representative newsletters from the previous year to Mistral's Le Chat produced suitable guidelines on the structure of the newsletter, tone, commonly used phrases, and important information to always include.
+I then added some personal knowledge manually and prohibited the use of Markdown and emojis.
 The result was a much more digestible, not overtly AI-generated text that I would be willing to send out.
 
 The workflow sends this generated newsletter to my Telegram account when it receives the `/compile` bot command.
-For the time being I do not want the workflow to send mails itself.
-Again, I would need to connect my personal Google account to do so, which seems like a security risk to me.
+For the time being I did not want the workflow to send mails itself.
+Again, I would need to connect my personal Google account to do so, which seemed like a security risk to me.
 
 ## Conclusion
 
 And with that, the workflow was complete.
-My new weekly process, which I validated for the last few weeks, is:
+My new weekly process is as follows:
 
 1. receive weekly prompt on Telegram
 2. copy it to the WhatsApp group chat
@@ -435,32 +437,33 @@ Not needing to copy messages around would be a tremendous improvement to the bot
 In terms of missing features, the completeness check mentioned above would be on top of the list, too.
 If it works, it would reliably reduce missing or unclear bits of information.
 
-Right now, the bot's workflow is pretty rigid and only uses AI for generating text.
+As described before, the bot's workflow is pretty rigid and only uses AI for generating text.
 If a newsletter needs to include a longer outlook or an additional calendar event from the coming week, I couldn't do it easily.
-By using n8n's _Agent Node_, I could surface the calendar and messages as tools for an AI agent.
+This is a requirement that could be solved by using n8n's _Agent Node_ where I could surface the calendar and messages as tools for an AI agent.
 This would give me much more flexibility, but make the behavior of the bot harder to reason about.
-On the other hand, it would give me an excuse to try out n8n's [evaluation capabilities](https://docs.n8n.io/advanced-ai/evaluations/overview/).
+If I go this route, it would definitely give me an excuse to try out n8n's [evaluation capabilities](https://docs.n8n.io/advanced-ai/evaluations/overview/).
 
-Overall, I am really satisfied with this project and n8n overall.
+Overall, I am really satisfied with this project and n8n.
 Could this automation workflow have been a Python script?
-Definetelly!
+Definitely!
 Was developing it with n8n much easier and more enjoyable?
 Absolutely!
-Executing nodes separately and out of order reminded me of Jupyter Notebooks.
+Executing nodes separately and out of order reminded me a lot of Jupyter Notebooks.
 It avoids needing to run the whole workflow for testing out localized changes.
 
+This project had one more constraint I didn't mention up until now: being as digitally independent as possible.
+This means, no US hyperscalers for infrastructure and no US LLM providers.
+As a European, I wanted to check just how challenging things would get if we got cut off from these companies[^4].
 In terms of digital independence, I count this project as a win, too.
 The platform, compute and AI are all of European origin.
 Sure, the boundaries, i.e., Telegram, WhatsApp and Google Calendar, are still problematic in this regard.
 But I could not rationalize migrating all of this for the sake of a personal experiment.
 Maybe, over time, I can convince my collaborators in the orchestra to go more independent.
 
-I will continue to evaluate this new workflow in the upcoming weeks.
-Up until now, I feel validated in what I stated in the introduction: AI has its use cases.
-You just need to find them.
+In the meantime, I'll enjoy my newfound freetime while AI writes my newsletter.
 
-[^1]: within this post, AI refers to LLMs
-[^2]: although the environmental impact is concerning
-[^3]: obviously the problem runs deeper than software, but I know of no European hardware provider yet
-[^4]: and there goes digital independence down the drain already
+[^1]: I've written this newsletter for almost ten years
+[^2]: within this post, AI refers to LLMs
+[^3]: although the environmental impact is concerning
+[^4]: obviously the problem runs deeper than software, but I know of no European hardware provider yet
 [^5]: [fair-code](https://faircode.io) is an interesting concept that may warrant a blog post of its own
