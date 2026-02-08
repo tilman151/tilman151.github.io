@@ -1,0 +1,388 @@
+<!doctype html><html lang=en dir=auto data-theme=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Letting AI Write a Newsletter with n8n | Don't Repeat Yourself</title><meta name=keywords content="ai,llm,automation"><meta name=description content="I’ve been a member of an orchestra in my hometown since childhood.
+Although I only get to play my chosen instrument a few times each year, I&rsquo;m still active in the orchestra&rsquo;s board.
+Due to my profession, most things that can be done digitally fall into my domain.
+I do not particularly enjoy these administrative tasks, but somebody has to do them.
+One of these tasks is especially bothersome: writing the weekly newsletter.
+This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks.
+The newsletter is also cross-posted into the orchestra&rsquo;s WhatsApp group chat.
+Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs."><meta name=author content><link rel=canonical href=https://tilman151.github.io/posts/ai-newsletter-with-n8n/><link crossorigin=anonymous href=/assets/css/stylesheet.4681e4454199e440388ae449b4a61bac46c467c2a81a195a794fa0fe8076c43d.css integrity="sha256-RoHkRUGZ5EA4iuRJtKYbrEbEZ8KoGhlaeU+g/oB2xD0=" rel="preload stylesheet" as=style><link rel=icon href=https://tilman151.github.io/img/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://tilman151.github.io/img/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://tilman151.github.io/img/favicon-32x32.png><link rel=apple-touch-icon href=https://tilman151.github.io/img/apple-touch-icon.png><link rel=mask-icon href=https://tilman151.github.io/img/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://tilman151.github.io/posts/ai-newsletter-with-n8n/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51);color-scheme:dark}.list{background:var(--theme)}.toc{background:var(--entry)}}@media(prefers-color-scheme:light){.list::-webkit-scrollbar-thumb{border-color:var(--code-bg)}}</style></noscript><script>localStorage.getItem("pref-theme")==="dark"?document.querySelector("html").dataset.theme="dark":localStorage.getItem("pref-theme")==="light"?document.querySelector("html").dataset.theme="light":window.matchMedia("(prefers-color-scheme: dark)").matches?document.querySelector("html").dataset.theme="dark":document.querySelector("html").dataset.theme="light"</script><script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    
+    const getTheme = () => {
+      return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'neutral';
+    };
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: getTheme(),
+    });
+
+    
+    const storeOriginalContent = () => {
+      document.querySelectorAll('.mermaid').forEach((el) => {
+        if (!el.getAttribute('data-original-content')) {
+          el.setAttribute('data-original-content', el.innerHTML);
+        }
+      });
+      mermaid.run({
+        querySelector: '.mermaid',
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', storeOriginalContent);
+    } else {
+      storeOriginalContent();
+    }
+
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        
+        
+        setTimeout(() => {
+          const newTheme = getTheme();
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: newTheme,
+          });
+          
+          
+          document.querySelectorAll('.mermaid').forEach((el) => {
+            if (el.getAttribute('data-processed')) {
+              el.removeAttribute('data-processed');
+              if (el.getAttribute('data-original-content')) {
+                el.innerHTML = el.getAttribute('data-original-content');
+              }
+            }
+          });
+          mermaid.run({
+            querySelector: '.mermaid',
+          });
+        }, 0);
+      });
+    }
+  </script><meta property="og:url" content="https://tilman151.github.io/posts/ai-newsletter-with-n8n/"><meta property="og:site_name" content="Don't Repeat Yourself"><meta property="og:title" content="Letting AI Write a Newsletter with n8n"><meta property="og:description" content="I’ve been a member of an orchestra in my hometown since childhood. Although I only get to play my chosen instrument a few times each year, I’m still active in the orchestra’s board. Due to my profession, most things that can be done digitally fall into my domain. I do not particularly enjoy these administrative tasks, but somebody has to do them. One of these tasks is especially bothersome: writing the weekly newsletter. This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks. The newsletter is also cross-posted into the orchestra’s WhatsApp group chat. Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs."><meta property="og:locale" content="en-us"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2026-02-08T00:00:00+00:00"><meta property="article:modified_time" content="2026-02-08T00:00:00+00:00"><meta property="article:tag" content="Ai"><meta property="article:tag" content="Llm"><meta property="article:tag" content="Automation"><meta name=twitter:card content="summary"><meta name=twitter:title content="Letting AI Write a Newsletter with n8n"><meta name=twitter:description content="I’ve been a member of an orchestra in my hometown since childhood.
+Although I only get to play my chosen instrument a few times each year, I&rsquo;m still active in the orchestra&rsquo;s board.
+Due to my profession, most things that can be done digitally fall into my domain.
+I do not particularly enjoy these administrative tasks, but somebody has to do them.
+One of these tasks is especially bothersome: writing the weekly newsletter.
+This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks.
+The newsletter is also cross-posted into the orchestra&rsquo;s WhatsApp group chat.
+Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://tilman151.github.io/posts/"},{"@type":"ListItem","position":2,"name":"Letting AI Write a Newsletter with n8n","item":"https://tilman151.github.io/posts/ai-newsletter-with-n8n/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Letting AI Write a Newsletter with n8n","name":"Letting AI Write a Newsletter with n8n","description":"I’ve been a member of an orchestra in my hometown since childhood. Although I only get to play my chosen instrument a few times each year, I\u0026rsquo;m still active in the orchestra\u0026rsquo;s board. Due to my profession, most things that can be done digitally fall into my domain. I do not particularly enjoy these administrative tasks, but somebody has to do them. One of these tasks is especially bothersome: writing the weekly newsletter. This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks. The newsletter is also cross-posted into the orchestra\u0026rsquo;s WhatsApp group chat. Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs.\n","keywords":["ai","llm","automation"],"articleBody":"I’ve been a member of an orchestra in my hometown since childhood. Although I only get to play my chosen instrument a few times each year, I’m still active in the orchestra’s board. Due to my profession, most things that can be done digitally fall into my domain. I do not particularly enjoy these administrative tasks, but somebody has to do them. One of these tasks is especially bothersome: writing the weekly newsletter. This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks. The newsletter is also cross-posted into the orchestra’s WhatsApp group chat. Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs.\nI was thinking about automating this task for a long time1. There were ideas of pre-formulated text fragments that could be dynamically stitched together, but it never seemed particularly promising. Now, we are living in the era of AI automation and if AI2 can do anything well, it is parsing unstructured data and writing prose. It seemed the best time to give in to my automation desires and replace the process you can see below.\nflowchart TD start((Start)) getEvents(Check this week's events in calendar) calendarInformation[/Weekly Events/] start--\u003egetEvents--\u003ecalendarInformation getOutlook(Check events for outlook) outlookInformation[/Outlook Events/] getOutlook--\u003eoutlookInformation createPrompt(Create prompt for information) calendarInformation--\u003ecreatePrompt sendPrompt(Send prompt to newsletter group chat) createPrompt--\u003esendPrompt wait(Wait for replies) sendPrompt--\u003ewait ifEnough{Enoughinformation?} wait--\u003eifEnough promptMore(Prompt missing information) collectInfo(Collect information from chat) chatInformation[/Information from chat/] ifEnough--\u003e|yes|collectInfo ifEnough--\u003e|no|promptMore--\u003ewait collectInfo--\u003echatInformation \u0026 getOutlook createNewsletter(Create newsletter mail) outlookInformation--\u003ecreateNewsletter calendarInformation--\u003ecreateNewsletter chatInformation--\u003ecreateNewsletter mailNewsletter(Send newsletter mail) chatNewsletter(Send newsletter to orchestra group chat) createNewsletter--\u003emailNewsletter \u0026 chatNewsletter stop(((Stop))) mailNewsletter--\u003estop chatNewsletter--\u003estop A lot of this process is inactive time, waiting for others to reply. The active tasks ordered by effort needed and time consumed are:\nChecking for completeness: verifying that all information for compiling the newsletter is available needs concentration and is error-prone. More often than not, I first notice that something is missing while already writing the newsletter text. Writing the newsletter: compiling the collected information into continuous text takes the most time. Looking up information: cross-referencing the calendar, messages, and information from the internet is especially hard when on mobile. Multitasking on a smartphone is more than annoying. Task three is the easiest. The orchestra’s calendar is public and can be retrieved via API. Messages can be collected directly from the chat and stored until compiling the newsletter. Task two is a typical LLM problem. There is no doubt that an LLM can write an adequate text given the appropriate information and suitable guidelines. Task one is the most complex. An LLM should be able to do it, but it needs guidelines on what to look for. An automated completeness check would need extensive evaluation before I would deem it trustworthy.\nAs an incomplete solution is better than no solution, I decided to automate the last two tasks in a first attempt and leave the first task optional. Next, I needed to decide on a platform to orchestrate my automation with.\nn8n - AI Automation Platform The platform I hear a lot about these days on LinkedIn and daily.dev ist n8n. It is a fair-code3 automation platform with builtin AI capabilities and a lot of integrations for various services. Self-hosting is free and simple, as well, with pre-built Docker images. Using the docs, I came up with this Docker compose file:\nservices: n8n: image: n8nio/n8n:1.123.16 container_name: n8n-main environment: - GENERIC_TIMEZONE=Europe/Berlin - TZ=Europe/Berlin - N8N_RUNNERS_ENABLED=true - N8N_RUNNERS_MODE=external - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0 - N8N_RUNNERS_AUTH_TOKEN= - N8N_NATIVE_PYTHON_RUNNER=true - WEBHOOK_URL= - N8N_PROXY_HOPS=1 - DB_SQLITE_POOL_SIZE=10 - N8N_GIT_NODE_DISABLE_BARE_REPOS=true - N8N_BLOCK_ENV_ACCESS_IN_NODE=true ports: - \"5678:5678\" volumes: - n8n_data:/home/node/.n8n task-runners: build: . container_name: n8n-runners environment: - N8N_RUNNERS_TASK_BROKER_URI=http://n8n-main:5679 - N8N_RUNNERS_AUTH_TOKEN= depends_on: - n8n volumes: n8n_data: This setup uses an SQLite database, as the instance only needs to support a single user, me. My instance runs behind a reverse proxy on my Strato VPS so N8N_PROXY_HOPS is set to one and WEBHOOK_URL to one of my domains. The setup uses a separate container to host JS and Python task runners, making it more robust than a single container setup. As I needed some third-party packages for my Python runners, I created a custom runner image as advised by the docs:\nFROM n8nio/runners:1.123.16 USER root RUN cd /opt/runners/task-runner-python \u0026\u0026 uv pip install icalevents pytz COPY n8n-task-runners.json /etc/n8n-task-runners.json USER runner At last, the packages needed to be added to an allowlist by modifying the default n8n-task-runners.json file from the repository.\n{ \"task-runners\": [ { \"runner-type\": \"javascript\", //... }, { \"runner-type\": \"python\", // ... \"env-overrides\": { // ... \"N8N_RUNNERS_STDLIB_ALLOW\": \"json,datetime,time,re\", \"N8N_RUNNERS_EXTERNAL_ALLOW\": \"icalevents,pytz\" } } ] } With this configuration done, the n8n instance is running on the VPS bound to localhost. It is not accessible from the internet but can be reached by ssh port forwarding. This gives less attack surface to any would-be hackers. Next, we need to figure out how the automation workflow communicates with the outside world.\nThe Chat in Chatbot As mentioned above, most communication in our orchestra happens over WhatsApp. My ideal version of the automated workflow would, therefore, be a chatbot that participates in the group chat: supplying context, parsing information from messages, and sending the newsletter draft for review. Fortunately, n8n comes with a WhatsApp cloud API integration, so I set out to get some credentials.\nWhy getting WhatsApp credentials is hard Turns out, WhatsApp (or more specifically Meta) wants only businesses to send automated messages. Therefore, you need WhatsApp business credentials. First, you need a Facebook account, which I didn’t have anymore. So I created an e-mail alias and with it a new Facebook account. Using this account, I set up a Meta Business Portfolio. Inside this portfolio, I created an app that includes the WhatsApp use case. To activate the use case, I needed a phone number without an associated WhatsApp account, so I ordered a free prepaid esim. Getting the esim was surprisingly the fastest and most straight forward step. With this new phone number and a credit card for payment information, I was able to activate the WhatsApp use case. At last, I needed to create a system user with permissions on the app to receive an API key. After several hours of setup, one day waiting for my account to be old enough to create a business portfolio, the API key did not work. Even several additional hours of bug fixing did not solve the issue, so I resignated. After failing miserably to acquire WhatsApp credentials, I needed another chat provider. My collaborators were unwilling to migrate away from WhatsApp, so the chatbot would have to communicate with me on another platform, and I’d forward the messages. This prevented my previous idea of full automation, but copying some messages would still be less work than before.\nFor personal communication, I try to use Signal as much as possible because it is free, open-source, and end-to-end encrypted. Unfortunately, Signal does not have an official bot API, and the inofficial ones seemed finicky to set up. If Signal does not want bots on their platform, I respect that.\nThis leaves Telegram. Just a few weeks before, I deleted the app from by phone because I successfully moved all contacts to Signal, so I was hesitant at first. But you have to leave it to Telegram, as setting up bot API credentials took less than a minute. The @botfather asks for your bot’s display name and handle and supplies an API key. That’s it!\nNow I had one last issue to fix. Given the n8n setup above, the instance could send messages but not receive it, as all incoming traffic was blocked by nginx. I still wanted to avoid revealing the instance to the open web, so I used the following addition to my nginx config:\nserver { # ... location /n8n/ { # Allow Telegram bot subnets allow 149.154.160.0/20; allow 91.108.4.0/22; # Deny all other IPs deny all; proxy_pass http://localhost:5678/; proxy_buffering off; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-Host $host; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Port $server_port; proxy_set_header X-Forwarded-Proto $scheme; proxy_pass_request_headers on; } # ... } This makes n8n available at /n8n/ but restricts incoming traffic to the subnets used by Telegram. Nginx passes the traffic to localhost with headers set as described in the docs. Certificates for HTTPS are handled by certbot’s nginx integration (not included in the snippet). With inputs and outputs defined, I could move on to creating the real automation logic.\nCreating the Weekly Prompt The first piece of the automation workflow is writing the weekly prompt. It is a one-paragraph summary of the week’s events and a request for additional information. The events need to be sourced from the orchestra’s public Google calendar.\nThis part of the workflow is triggered by a Schedule Trigger set to 10:00 each Monday. I didn’t want to connect my personal Google account to n8n, so I opted for reading the calendar as an ICS file. Unfortunately, the builtin parser node failed me, and I didn’t want to bother with installing community nodes, so I used the Code Node to execute a Python script:\nimport datetime from icalevents.icalevents import events import pytz calendar_id = \"\" ics_url = f\"https://calendar.google.com/calendar/ical/{calendar_id}/public/basic.ics\" tz = pytz.timezone(\"Europe/Berlin\") now = datetime.datetime.fromisoformat(_items[0][\"json\"][\"timestamp\"]) end_date = now + datetime.timedelta(days=7) cal = events(ics_url, end=end_date, sort=True) return [ { \"summary\": e.summary, \"location\": e.location or \"\", \"start\": e.start.strftime(\"%A %H:%M\"), \"end\": e.end.strftime(\"%A %H:%M\"), } for e in cal ] The script takes the timestamp from the trigger node and fetches the calendar events for the next seven days. It then converts the events into a list of dictionaries. The start and end timestamps of each event are converted to weekday and time, because this is how they should be formatted in the prompt.\nEach event is now a workflow item, which would be processed separately by the next node. But the LLM needs all events at once, so the Aggregate Node merges them into a single item. This feeds into an LLM Chain Node whose system prompt boils down to: take these event JSONs and encode them in a paragraph of text. Additionally, the system prompt contains instructions on tone and conventions. There are, for example, two common rehearsal locations, which should only be referred to as “the theater” and “the school.” Without this instruction the LLM wrote out the whole name of the location each time, which would sound jarring for the reader.\nI chose Mistral as the model provider, because they have a free API usage plan, which is more than enough for this project. The mistral-small model proved itself sufficient for generating the prompt and provides low-latency responses. At last, the final prompt is sent to my Telegram account so that I can forward it to WhatsApp.\nCollecting Information from Messages My collaborators in the group chat were prompted to supply information, so now I needed a way to store their replies. The Data Table Node provides the perfect solution by offering lightweight database tables directly in n8n. No external database server needed.\nThe Telegram Trigger starts this part of the workflow each time a message is received. The trigger node supports user ID restrictions so that the bot only reacts to my Telegram account. If the message is not a bot command, like \\reset, it stores the message text in the messages data table. This way, the messages for the current week can be retrieved by applying a filter on the creation timestamp.\nTo avoid filling the table with more and more messages, another Data Table Node is connected to the Schedule Trigger to delete all messages of the previous week.\nBringing Everything Together As outlined above, the newsletter needs three types of information:\nthe events for this week, the messages with additional information, and the events of the next fews weeks for the outlook. The messages are already persisted in a data table, so why not store the other pices of information there, too? First, I piped the current week’s events fetched by the scheduled workflow part into a separate data table. Then a slightly modified copy of the Code Node fetches the events for the outlook:\nimport datetime import re from icalevents.icalevents events import pytz calendar_id = \"\" ics_url = f\"https://calendar.google.com/calendar/ical/{calendar_id}/public/basic.ics\" tz = pytz.timezone(\"Europe/Berlin\") now = datetime.datetime.fromisoformat(_items[0][\"json\"][\"timestamp\"]) + start_date = now + datetime.timedelta(days=7) + end_date = now + datetime.timedelta(days=38) + cal = events(ics_url, start=start_date, end=end_date, sort=True) - end_date = now + datetime.timedelta(days=7) - cal = events(ics_url, end=end_date, sort=True) return [ { \"summary\": e.summary, \"location\": e.location or \"\", + \"start\": e.start.isoformat(), + \"end\": e.end.isoformat(), - \"start\": e.start.strftime(\"%A %H:%M\"), - \"end\": e.end.strftime(\"%A %H:%M\"), } for i, e in enumerate(cal) + if not re.match(\"^Probe\\s?\", e.summary) ] This pulls the events for the next 30 days after the current week. The timestamps are formatted as ISO strings this time as more specific date infos are needed. At last, all events that are likely rehearsals are filtered out, as they are unimportant for the outlook.\nWith all pieces in separate data tables, I needed to combine them into a single workflow item. First, all rows from each table are fetched and aggregated into a single workflow item. This leaves us with one item for each table. Fortunately, the Merge Node is intended for such use cases. It can be used like an SQL join, but needs a join key. As all items should be joined into a single item, I used the Set Node to add a dummy \"id\": 0 field to each item. With custom SQL mode, the Merge Node can use this code:\nSELECT * FROM input1 LEFT JOIN input2 ON input1.id = input2.id LEFT JOIN input3 ON input1.id = input3.id to produce an item that looks like this:\n[ { \"id\": 0, \"messages\": [ // ... ], \"weeklyEvents\": [ // ... ], \"outlook\": [ // ... ] } ] This input was all I needed to make the LLM do its thing.\nCompiling the Newsletter As the context for the LLM was already prepared, a simple LLM Chain Node was enough to do the rest. One may ask why I took this approach to preparing the context and did not go agentic. The honest answer is, I am an AI skeptic. Even though it’s my job as a data and AI consultant to build AI-driven solutions, I do not share the hype. The problem is not the technology itself4, but the way people and businesses approach it. They see it as the solution to all their problems and use it to reinvent things that never needed AI in the first place. AI has its uses, but it is surely not modeling clearly defined, unambiguous processes. This is why I tend to start with a rigid but deterministic solution and only go agentic if needed.\nAnyway, back to the problem at hand. The user prompt template for the LLM is as follows:\nNachrichten: {{ JSON.stringify($json.messages, null, 2) }} Termine: {{ JSON.stringify($json.weeklyEvents, null, 2) }} Ausblick: {{ JSON.stringify($json.outlook, null, 2) }} This pretty-prints the JSON of each information type under its own heading. Using a short instruction as the system prompt produced the most AI-sounding newsletter ever: tons of emojis, excessive use of Markdown, and an annoyingly upbeat tone. Again, the LLM was missing guidelines on my personal way of writing and knowledge. For example, if there is no other mention of it, the mail should state the default rehearsal time for the youth orchestra before the regular rehearsal.\nIt is surprisingly hard to spell out instructions for such things, as I do it subconsciously. Luckily, I had been writing these mails for a long time, so I had a lot of example data. Feeding a few representative newsletters from the previous year to Mistral’s Le Chat produced suitable guidelines on the structure of the newsletter, tone, commonly used phrases, and important information to always include. I then added some personal knowledge manually and prohibited the use of Markdown and emojis. The result was a much more digestible, not overtly AI-generated text that I would be willing to send out.\nThe workflow sends this generated newsletter to my Telegram account when it receives the /compile bot command. For the time being I did not want the workflow to send mails itself. Again, I would need to connect my personal Google account to do so, which seemed like a security risk to me.\nConclusion And with that, the workflow was complete. My new weekly process is as follows:\nreceive weekly prompt on Telegram copy it to the WhatsApp group chat wait for responses and copy them to Telegram trigger newsletter generation with /compile check for errors send mail and forward it to WhatsApp chat It’s not perfect, but it works. If I had to estimate, it saves me at least 1-2 hours each week. Additionally, I expect errors in the newsletter to drop because I don’t have to write it while multitasking other stuff. Also, I find checking for errors in text I did not write myself much easier.\nNevertheless, there are several things I’d like to improve for a version 2.0. First and foremost, I would integrate the chatbot into WhatsApp directly and let it send the mail itself after review. After I finished building the workflow, I found some promising community nodes that integrate with Evolution API or Baileys, which would make WhatsApp communication possible. A separate mail account for the bot would solve the issues with connecting my Google account. Not needing to copy messages around would be a tremendous improvement to the bot’s UX.\nIn terms of missing features, the completeness check mentioned above would be on top of the list, too. If it works, it would reliably reduce missing or unclear bits of information.\nAs described before, the bot’s workflow is pretty rigid and only uses AI for generating text. If a newsletter needs to include a longer outlook or an additional calendar event from the coming week, I couldn’t do it easily. This is a requirement that could be solved by using n8n’s Agent Node where I could surface the calendar and messages as tools for an AI agent. This would give me much more flexibility, but make the behavior of the bot harder to reason about. If I go this route, it would definitely give me an excuse to try out n8n’s evaluation capabilities.\nOverall, I am really satisfied with this project and n8n. Could this automation workflow have been a Python script? Definitely! Was developing it with n8n much easier and more enjoyable? Absolutely! Executing nodes separately and out of order reminded me a lot of Jupyter Notebooks. It avoids needing to run the whole workflow for testing out localized changes.\nThis project had one more constraint I didn’t mention up until now: being as digitally independent as possible. This means, no US hyperscalers for infrastructure and no US LLM providers. As a European, I wanted to check just how challenging things would get if we got cut off from these companies5. In terms of digital independence, I count this project as a win, too. The platform, compute and AI are all of European origin. Sure, the boundaries, i.e., Telegram, WhatsApp and Google Calendar, are still problematic in this regard. But I could not rationalize migrating all of this for the sake of a personal experiment. Maybe, over time, I can convince my collaborators in the orchestra to go more independent.\nIn the meantime, I’ll enjoy my newfound freetime while AI writes my newsletter.\nI’ve written this newsletter for almost ten years ↩︎\nwithin this post, AI refers to LLMs ↩︎\nfair-code is an interesting concept that may warrant a blog post of its own ↩︎\nalthough the environmental impact is concerning ↩︎\nobviously the problem runs deeper than software, but I know of no European hardware provider yet ↩︎\n","wordCount":"3290","inLanguage":"en","datePublished":"2026-02-08T00:00:00Z","dateModified":"2026-02-08T00:00:00Z","mainEntityOfPage":{"@type":"WebPage","@id":"https://tilman151.github.io/posts/ai-newsletter-with-n8n/"},"publisher":{"@type":"Organization","name":"Don't Repeat Yourself","logo":{"@type":"ImageObject","url":"https://tilman151.github.io/img/favicon.ico"}}}</script></head><body id=top><header class=header><nav class=nav><div class=logo><a href=https://tilman151.github.io/ accesskey=h title="Don't Repeat Yourself (Alt + H)">Don't Repeat Yourself</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme">
+<svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://tilman151.github.io/publications/ title=Publications><span>Publications</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><h1 class="post-title entry-hint-parent">Letting AI Write a Newsletter with n8n</h1><div class=post-meta><span title='2026-02-08 00:00:00 +0000 UTC'>8 February 2026</span>&nbsp;·&nbsp;<span>16 min</span></div></header><div class=post-content><p>I’ve been a member of an orchestra in my hometown since childhood.
+Although I only get to play my chosen instrument a few times each year, I&rsquo;m still active in the orchestra&rsquo;s board.
+Due to my profession, most things that can be done digitally fall into my domain.
+I do not particularly enjoy these administrative tasks, but somebody has to do them.
+One of these tasks is especially bothersome: <em>writing the weekly newsletter</em>.
+This newsletter is an e-mail with all important dates for the week, reminders, and an outlook of events in the next few weeks.
+The newsletter is also cross-posted into the orchestra&rsquo;s WhatsApp group chat.
+Compiling this newsletter means checking several sources for information and bringing them together in a few well-written paragraphs.</p><p>I was thinking about automating this task for a long time<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>.
+There were ideas of pre-formulated text fragments that could be dynamically stitched together, but it never seemed particularly promising.
+Now, we are living in the era of AI automation and if AI<sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup> can do anything well, it is parsing unstructured data and writing prose.
+It seemed the best time to give in to my automation desires and replace the process you can see below.</p><pre class=mermaid>
+  flowchart TD
+    start((Start))
+    getEvents(Check this week&#39;s events in calendar)
+    calendarInformation[/Weekly Events/]
+    start--&gt;getEvents--&gt;calendarInformation
+    getOutlook(Check events for outlook)
+    outlookInformation[/Outlook Events/]
+    getOutlook--&gt;outlookInformation
+    createPrompt(Create prompt for information)
+    calendarInformation--&gt;createPrompt
+    sendPrompt(Send prompt to newsletter group chat)
+    createPrompt--&gt;sendPrompt
+    wait(Wait for replies)
+    sendPrompt--&gt;wait
+    ifEnough{Enough&lt;br/&gt;information?}
+    wait--&gt;ifEnough
+    promptMore(Prompt missing information)
+    collectInfo(Collect information from chat)
+    chatInformation[/Information from chat/]
+    ifEnough--&gt;|yes|collectInfo
+    ifEnough--&gt;|no|promptMore--&gt;wait
+    collectInfo--&gt;chatInformation &amp; getOutlook
+    createNewsletter(Create newsletter mail)
+    outlookInformation--&gt;createNewsletter
+    calendarInformation--&gt;createNewsletter
+    chatInformation--&gt;createNewsletter
+    mailNewsletter(Send newsletter mail)
+    chatNewsletter(Send newsletter to orchestra group chat)
+    createNewsletter--&gt;mailNewsletter &amp; chatNewsletter
+    stop(((Stop)))
+    mailNewsletter--&gt;stop
+    chatNewsletter--&gt;stop
+</pre><p>A lot of this process is inactive time, waiting for others to reply.
+The active tasks ordered by effort needed and time consumed are:</p><ol><li><strong>Checking for completeness:</strong> verifying that all information for compiling the newsletter is available needs concentration and is error-prone. More often than not, I first notice that something is missing while already writing the newsletter text.</li><li><strong>Writing the newsletter:</strong> compiling the collected information into continuous text takes the most time.</li><li><strong>Looking up information:</strong> cross-referencing the calendar, messages, and information from the internet is especially hard when on mobile. Multitasking on a smartphone is more than annoying.</li></ol><p>Task three is the easiest.
+The orchestra&rsquo;s calendar is public and can be retrieved via API.
+Messages can be collected directly from the chat and stored until compiling the newsletter.
+Task two is a typical LLM problem.
+There is no doubt that an LLM can write an adequate text given the appropriate information and suitable guidelines.
+Task one is the most complex.
+An LLM should be able to do it, but it needs guidelines on what to look for.
+An automated completeness check would need extensive evaluation before I would deem it trustworthy.</p><p>As an incomplete solution is better than no solution, I decided to automate the last two tasks in a first attempt and leave the first task optional.
+Next, I needed to decide on a platform to orchestrate my automation with.</p><h2 id=n8n---ai-automation-platform>n8n - AI Automation Platform<a hidden class=anchor aria-hidden=true href=#n8n---ai-automation-platform>#</a></h2><p>The platform I hear a lot about these days on LinkedIn and daily.dev ist <a href=https://n8n.io>n8n</a>.
+It is a fair-code<sup id=fnref:3><a href=#fn:3 class=footnote-ref role=doc-noteref>3</a></sup> automation platform with builtin AI capabilities and a lot of integrations for various services.
+Self-hosting is free and simple, as well, with pre-built Docker images.
+Using the <a href=https://docs.n8n.io/hosting/installation/docker>docs</a>, I came up with this Docker compose file:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>services</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>n8n</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>image</span>: <span style=color:#ae81ff>n8nio/n8n:1.123.16</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>container_name</span>: <span style=color:#ae81ff>n8n-main</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>GENERIC_TIMEZONE=Europe/Berlin</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>TZ=Europe/Berlin</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_RUNNERS_ENABLED=true</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_RUNNERS_MODE=external</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_RUNNERS_AUTH_TOKEN=&lt;your auth token&gt;</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_NATIVE_PYTHON_RUNNER=true</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>WEBHOOK_URL=&lt;your domain&gt;</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_PROXY_HOPS=1</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>DB_SQLITE_POOL_SIZE=10</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_GIT_NODE_DISABLE_BARE_REPOS=true</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_BLOCK_ENV_ACCESS_IN_NODE=true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#34;5678:5678&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>n8n_data:/home/node/.n8n</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>task-runners</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>build</span>: <span style=color:#ae81ff>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>container_name</span>: <span style=color:#ae81ff>n8n-runners</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_RUNNERS_TASK_BROKER_URI=http://n8n-main:5679</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>N8N_RUNNERS_AUTH_TOKEN=&lt;your auth token&gt;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>depends_on</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>n8n</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>n8n_data</span>:
+</span></span></code></pre></div><p>This setup uses an SQLite database, as the instance only needs to support a single user, me.
+My instance runs behind a reverse proxy on my Strato VPS so <code>N8N_PROXY_HOPS</code> is set to one and <code>WEBHOOK_URL</code> to one of my domains.
+The setup uses a separate container to host JS and Python task runners, making it more robust than a single container setup.
+As I needed some third-party packages for my Python runners, I created a custom runner image as advised by the <a href=https://docs.n8n.io/hosting/configuration/task-runners/#adding-extra-dependencies>docs</a>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span> <span style=color:#e6db74>n8nio/runners:1.123.16</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>USER</span> <span style=color:#e6db74>root</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>RUN</span> cd /opt/runners/task-runner-python <span style=color:#f92672>&amp;&amp;</span> uv pip install icalevents pytz<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>COPY</span> n8n-task-runners.json /etc/n8n-task-runners.json<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#66d9ef>USER</span> <span style=color:#e6db74>runner</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><p>At last, the packages needed to be added to an allowlist by modifying the default <code>n8n-task-runners.json</code> file from the <a href=https://github.com/n8n-io/n8n/blob/master/docker/images/runners/n8n-task-runners.json>repository</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>	<span style=color:#f92672>&#34;task-runners&#34;</span>: [
+</span></span><span style=display:flex><span>		{
+</span></span><span style=display:flex><span>			<span style=color:#f92672>&#34;runner-type&#34;</span>: <span style=color:#e6db74>&#34;javascript&#34;</span>,
+</span></span><span style=display:flex><span>			<span style=color:#75715e>//...
+</span></span></span><span style=display:flex><span>		},
+</span></span><span style=display:flex><span>		{
+</span></span><span style=display:flex><span>			<span style=color:#f92672>&#34;runner-type&#34;</span>: <span style=color:#e6db74>&#34;python&#34;</span>,
+</span></span><span style=display:flex><span>			<span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span>			<span style=color:#f92672>&#34;env-overrides&#34;</span>: {
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span>				<span style=color:#f92672>&#34;N8N_RUNNERS_STDLIB_ALLOW&#34;</span>: <span style=color:#e6db74>&#34;json,datetime,time,re&#34;</span>,
+</span></span><span style=display:flex><span>				<span style=color:#f92672>&#34;N8N_RUNNERS_EXTERNAL_ALLOW&#34;</span>: <span style=color:#e6db74>&#34;icalevents,pytz&#34;</span>
+</span></span><span style=display:flex><span>			}
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With this configuration done, the n8n instance is running on the VPS bound to <code>localhost</code>.
+It is not accessible from the internet but can be reached by ssh port forwarding.
+This gives less attack surface to any would-be hackers.
+Next, we need to figure out how the automation workflow communicates with the outside world.</p><h2 id=the-chat-in-chatbot>The <em>Chat</em> in Chatbot<a hidden class=anchor aria-hidden=true href=#the-chat-in-chatbot>#</a></h2><p>As mentioned above, most communication in our orchestra happens over WhatsApp.
+My ideal version of the automated workflow would, therefore, be a chatbot that participates in the group chat: supplying context, parsing information from messages, and sending the newsletter draft for review.
+Fortunately, n8n comes with a WhatsApp cloud API integration, so I set out to get some credentials.</p><p><details><summary markdown=span>Why getting WhatsApp credentials is hard</summary>Turns out, WhatsApp (or more specifically Meta) wants only businesses to send automated messages.
+Therefore, you need WhatsApp business credentials.
+First, you need a Facebook account, which I didn&rsquo;t have anymore.
+So I created an e-mail alias and with it a new Facebook account.
+Using this account, I set up a Meta Business Portfolio.
+Inside this portfolio, I created an app that includes the WhatsApp use case.
+To activate the use case, I needed a phone number without an associated WhatsApp account, so I ordered a free prepaid esim.
+Getting the esim was surprisingly the fastest and most straight forward step.
+With this new phone number and a credit card for payment information, I was able to activate the WhatsApp use case.
+At last, I needed to create a system user with permissions on the app to receive an API key.
+After several hours of setup, one day waiting for my account to be old enough to create a business portfolio, the API key did not work.
+Even several additional hours of bug fixing did not solve the issue, so I resignated.</details></p><p>After failing miserably to acquire WhatsApp credentials, I needed another chat provider.
+My collaborators were unwilling to migrate away from WhatsApp, so the chatbot would have to communicate with me on another platform, and I&rsquo;d forward the messages.
+This prevented my previous idea of full automation, but copying some messages would still be less work than before.</p><p>For personal communication, I try to use Signal as much as possible because it is free, open-source, and end-to-end encrypted.
+Unfortunately, Signal does not have an official bot API, and the inofficial ones seemed finicky to set up.
+If Signal does not want bots on their platform, I respect that.</p><p>This leaves Telegram.
+Just a few weeks before, I deleted the app from by phone because I successfully moved all contacts to Signal, so I was hesitant at first.
+But you have to leave it to Telegram, as setting up bot API credentials took less than a minute.
+The <code>@botfather</code> asks for your bot&rsquo;s display name and handle and supplies an API key.
+That&rsquo;s it!</p><p>Now I had one last issue to fix.
+Given the n8n setup above, the instance could send messages but not receive it, as all incoming traffic was blocked by nginx.
+I still wanted to avoid revealing the instance to the open web, so I used the following addition to my nginx config:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-nginx data-lang=nginx><span style=display:flex><span><span style=color:#66d9ef>server</span> {
+</span></span><span style=display:flex><span>  <span style=color:#75715e># ...
+</span></span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>location</span> <span style=color:#e6db74>/n8n/</span> {
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Allow Telegram bot subnets
+</span></span></span><span style=display:flex><span>    <span style=color:#f92672>allow</span> 149.154.160.0<span style=color:#e6db74>/20</span>;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>allow</span> 91.108.4.0<span style=color:#e6db74>/22</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e># Deny all other IPs
+</span></span></span><span style=display:flex><span>    <span style=color:#f92672>deny</span> <span style=color:#e6db74>all</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_pass</span> <span style=color:#e6db74>http://localhost:5678/</span>;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_buffering</span> <span style=color:#66d9ef>off</span>;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Real-IP</span> $remote_addr;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Forwarded-Host</span> $host;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Forwarded-For</span> $proxy_add_x_forwarded_for;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Forwarded-Port</span> $server_port;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Forwarded-Proto</span> $scheme;
+</span></span><span style=display:flex><span>    <span style=color:#f92672>proxy_pass_request_headers</span> <span style=color:#66d9ef>on</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># ...
+</span></span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>This makes n8n available at <code>&lt;my_domain>/n8n/</code> but restricts incoming traffic to the <a href=https://core.telegram.org/resources/cidr.txt>subnets used by Telegram</a>.
+Nginx passes the traffic to localhost with headers set as described in the <a href=https://docs.n8n.io/hosting/configuration/configuration-examples/webhook-url/>docs</a>.
+Certificates for HTTPS are handled by <a href=https://certbot.eff.org/instructions>certbot&rsquo;s nginx integration</a> (not included in the snippet).
+With inputs and outputs defined, I could move on to creating the real automation logic.</p><h2 id=creating-the-weekly-prompt>Creating the Weekly Prompt<a hidden class=anchor aria-hidden=true href=#creating-the-weekly-prompt>#</a></h2><p>The first piece of the automation workflow is writing the weekly prompt.
+It is a one-paragraph summary of the week&rsquo;s events and a request for additional information.
+The events need to be sourced from the orchestra&rsquo;s public Google calendar.</p><p>This part of the workflow is triggered by a <em>Schedule Trigger</em> set to 10:00 each Monday.
+I didn&rsquo;t want to connect my personal Google account to n8n, so I opted for reading the calendar as an ICS file.
+Unfortunately, the builtin parser node failed me, and I didn&rsquo;t want to bother with installing community nodes, so I used the <em>Code Node</em> to execute a Python script:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> datetime
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> icalevents.icalevents <span style=color:#f92672>import</span> events
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> pytz
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>calendar_id <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&lt;calendar_id&gt;&#34;</span>
+</span></span><span style=display:flex><span>ics_url <span style=color:#f92672>=</span> <span style=color:#e6db74>f</span><span style=color:#e6db74>&#34;https://calendar.google.com/calendar/ical/</span><span style=color:#e6db74>{</span>calendar_id<span style=color:#e6db74>}</span><span style=color:#e6db74>/public/basic.ics&#34;</span>
+</span></span><span style=display:flex><span>tz <span style=color:#f92672>=</span> pytz<span style=color:#f92672>.</span>timezone(<span style=color:#e6db74>&#34;Europe/Berlin&#34;</span>)
+</span></span><span style=display:flex><span>now <span style=color:#f92672>=</span> datetime<span style=color:#f92672>.</span>datetime<span style=color:#f92672>.</span>fromisoformat(_items[<span style=color:#ae81ff>0</span>][<span style=color:#e6db74>&#34;json&#34;</span>][<span style=color:#e6db74>&#34;timestamp&#34;</span>])
+</span></span><span style=display:flex><span>end_date <span style=color:#f92672>=</span> now <span style=color:#f92672>+</span> datetime<span style=color:#f92672>.</span>timedelta(days<span style=color:#f92672>=</span><span style=color:#ae81ff>7</span>)
+</span></span><span style=display:flex><span>cal <span style=color:#f92672>=</span> events(ics_url, end<span style=color:#f92672>=</span>end_date, sort<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;summary&#34;</span>: e<span style=color:#f92672>.</span>summary,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;location&#34;</span>: e<span style=color:#f92672>.</span>location <span style=color:#f92672>or</span> <span style=color:#e6db74>&#34;&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;start&#34;</span>: e<span style=color:#f92672>.</span>start<span style=color:#f92672>.</span>strftime(<span style=color:#e6db74>&#34;%A %H:%M&#34;</span>),
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;end&#34;</span>: e<span style=color:#f92672>.</span>end<span style=color:#f92672>.</span>strftime(<span style=color:#e6db74>&#34;%A %H:%M&#34;</span>),
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> e <span style=color:#f92672>in</span> cal
+</span></span><span style=display:flex><span>]
+</span></span></code></pre></div><p>The script takes the timestamp from the trigger node and fetches the calendar events for the next seven days.
+It then converts the events into a list of dictionaries.
+The start and end timestamps of each event are converted to weekday and time, because this is how they should be formatted in the prompt.</p><p>Each event is now a workflow item, which would be processed separately by the next node.
+But the LLM needs all events at once, so the <em>Aggregate Node</em> merges them into a single item.
+This feeds into an <em>LLM Chain Node</em> whose system prompt boils down to: take these event JSONs and encode them in a paragraph of text.
+Additionally, the system prompt contains instructions on tone and conventions.
+There are, for example, two common rehearsal locations, which should only be referred to as &ldquo;the theater&rdquo; and &ldquo;the school.&rdquo;
+Without this instruction the LLM wrote out the whole name of the location each time, which would sound jarring for the reader.</p><p>I chose <a href=https://mistral.ai>Mistral</a> as the model provider, because they have a free API usage plan, which is more than enough for this project.
+The <code>mistral-small</code> model proved itself sufficient for generating the prompt and provides low-latency responses.
+At last, the final prompt is sent to my Telegram account so that I can forward it to WhatsApp.</p><h2 id=collecting-information-from-messages>Collecting Information from Messages<a hidden class=anchor aria-hidden=true href=#collecting-information-from-messages>#</a></h2><p>My collaborators in the group chat were prompted to supply information, so now I needed a way to store their replies.
+The <em>Data Table Node</em> provides the perfect solution by offering lightweight database tables directly in n8n.
+No external database server needed.</p><p>The <em>Telegram Trigger</em> starts this part of the workflow each time a message is received.
+The trigger node supports user ID restrictions so that the bot only reacts to my Telegram account.
+If the message is not a bot command, like <code>\reset</code>, it stores the message text in the <code>messages</code> data table.
+This way, the messages for the current week can be retrieved by applying a filter on the creation timestamp.</p><p>To avoid filling the table with more and more messages, another <em>Data Table Node</em> is connected to the <em>Schedule Trigger</em> to delete all messages of the previous week.</p><h2 id=bringing-everything-together>Bringing Everything Together<a hidden class=anchor aria-hidden=true href=#bringing-everything-together>#</a></h2><p>As outlined above, the newsletter needs three types of information:</p><ol><li>the events for this week,</li><li>the messages with additional information,</li><li>and the events of the next fews weeks for the outlook.</li></ol><p>The messages are already persisted in a data table, so why not store the other pices of information there, too?
+First, I piped the current week&rsquo;s events fetched by the scheduled workflow part into a separate data table.
+Then a slightly modified copy of the <em>Code Node</em> fetches the events for the outlook:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-diff data-lang=diff><span style=display:flex><span>import datetime
+</span></span><span style=display:flex><span>import re
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>from icalevents.icalevents events
+</span></span><span style=display:flex><span>import pytz
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>calendar_id = &#34;&lt;calendar_id&gt;&#34;
+</span></span><span style=display:flex><span>ics_url = f&#34;https://calendar.google.com/calendar/ical/{calendar_id}/public/basic.ics&#34;
+</span></span><span style=display:flex><span>tz = pytz.timezone(&#34;Europe/Berlin&#34;)
+</span></span><span style=display:flex><span>now = datetime.datetime.fromisoformat(_items[0][&#34;json&#34;][&#34;timestamp&#34;])
+</span></span><span style=display:flex><span><span style=color:#a6e22e>+ start_date = now + datetime.timedelta(days=7)
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e>+ end_date = now + datetime.timedelta(days=38)
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e>+ cal = events(ics_url, start=start_date, end=end_date, sort=True)
+</span></span></span><span style=display:flex><span><span style=color:#f92672>- end_date = now + datetime.timedelta(days=7)
+</span></span></span><span style=display:flex><span><span style=color:#f92672>- cal = events(ics_url, end=end_date, sort=True)
+</span></span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>return [
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    &#34;summary&#34;: e.summary,
+</span></span><span style=display:flex><span>    &#34;location&#34;: e.location or &#34;&#34;,
+</span></span><span style=display:flex><span><span style=color:#a6e22e>+   &#34;start&#34;: e.start.isoformat(),
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e>+   &#34;end&#34;: e.end.isoformat(),
+</span></span></span><span style=display:flex><span><span style=color:#f92672>-   &#34;start&#34;: e.start.strftime(&#34;%A %H:%M&#34;),
+</span></span></span><span style=display:flex><span><span style=color:#f92672>-   &#34;end&#34;: e.end.strftime(&#34;%A %H:%M&#34;),
+</span></span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  for i, e in enumerate(cal)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>+ if not re.match(&#34;^Probe\s?&#34;, e.summary)
+</span></span></span><span style=display:flex><span>]
+</span></span></code></pre></div><p>This pulls the events for the next 30 days after the current week.
+The timestamps are formatted as ISO strings this time as more specific date infos are needed.
+At last, all events that are likely rehearsals are filtered out, as they are unimportant for the outlook.</p><p>With all pieces in separate data tables, I needed to combine them into a single workflow item.
+First, all rows from each table are fetched and aggregated into a single workflow item.
+This leaves us with one item for each table.
+Fortunately, the <em>Merge Node</em> is intended for such use cases.
+It can be used like an SQL join, but needs a join key.
+As all items should be joined into a single item, I used the <em>Set Node</em> to add a dummy <code>"id": 0</code> field to each item.
+With custom SQL mode, the <em>Merge Node</em> can use this code:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#66d9ef>SELECT</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>FROM</span> input1
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>LEFT</span> <span style=color:#66d9ef>JOIN</span> input2 <span style=color:#66d9ef>ON</span> input1.id <span style=color:#f92672>=</span> input2.id
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>LEFT</span> <span style=color:#66d9ef>JOIN</span> input3 <span style=color:#66d9ef>ON</span> input1.id <span style=color:#f92672>=</span> input3.id
+</span></span></code></pre></div><p>to produce an item that looks like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-json data-lang=json><span style=display:flex><span>[
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;id&#34;</span>: <span style=color:#ae81ff>0</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;messages&#34;</span>: [
+</span></span><span style=display:flex><span>      <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span>    ],
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;weeklyEvents&#34;</span>: [
+</span></span><span style=display:flex><span>      <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span>    ],
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;outlook&#34;</span>: [
+</span></span><span style=display:flex><span>      <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>]
+</span></span></code></pre></div><p>This input was all I needed to make the LLM do its thing.</p><h2 id=compiling-the-newsletter>Compiling the Newsletter<a hidden class=anchor aria-hidden=true href=#compiling-the-newsletter>#</a></h2><p>As the context for the LLM was already prepared, a simple <em>LLM Chain Node</em> was enough to do the rest.
+One may ask why I took this approach to preparing the context and did not go agentic.
+The honest answer is, I am an AI skeptic.
+Even though it&rsquo;s my job as a data and AI consultant to build AI-driven solutions, I do not share the hype.
+The problem is not the technology itself<sup id=fnref:4><a href=#fn:4 class=footnote-ref role=doc-noteref>4</a></sup>, but the way people and businesses approach it.
+They see it as the solution to all their problems and use it to reinvent things that never needed AI in the first place.
+AI has its uses, but it is surely not modeling clearly defined, unambiguous processes.
+This is why I tend to start with a rigid but deterministic solution and only go agentic if needed.</p><p>Anyway, back to the problem at hand.
+The user prompt template for the LLM is as follows:</p><pre tabindex=0><code>Nachrichten:
+{{ JSON.stringify($json.messages, null, 2) }}
+
+Termine:
+{{ JSON.stringify($json.weeklyEvents, null, 2) }}
+
+Ausblick:
+{{ JSON.stringify($json.outlook, null, 2) }}
+</code></pre><p>This pretty-prints the JSON of each information type under its own heading.
+Using a short instruction as the system prompt produced the most AI-sounding newsletter ever: tons of emojis, excessive use of Markdown, and an annoyingly upbeat tone.
+Again, the LLM was missing guidelines on my personal way of writing and knowledge.
+For example, if there is no other mention of it, the mail should state the default rehearsal time for the youth orchestra before the regular rehearsal.</p><p>It is surprisingly hard to spell out instructions for such things, as I do it subconsciously.
+Luckily, I had been writing these mails for a <em>long</em> time, so I had a lot of example data.
+Feeding a few representative newsletters from the previous year to Mistral&rsquo;s Le Chat produced suitable guidelines on the structure of the newsletter, tone, commonly used phrases, and important information to always include.
+I then added some personal knowledge manually and prohibited the use of Markdown and emojis.
+The result was a much more digestible, not overtly AI-generated text that I would be willing to send out.</p><p>The workflow sends this generated newsletter to my Telegram account when it receives the <code>/compile</code> bot command.
+For the time being I did not want the workflow to send mails itself.
+Again, I would need to connect my personal Google account to do so, which seemed like a security risk to me.</p><h2 id=conclusion>Conclusion<a hidden class=anchor aria-hidden=true href=#conclusion>#</a></h2><p>And with that, the workflow was complete.
+My new weekly process is as follows:</p><ol><li>receive weekly prompt on Telegram</li><li>copy it to the WhatsApp group chat</li><li>wait for responses and copy them to Telegram</li><li>trigger newsletter generation with <code>/compile</code></li><li>check for errors</li><li>send mail and forward it to WhatsApp chat</li></ol><p>It&rsquo;s not perfect, but it works.
+If I had to estimate, it saves me at least 1-2 hours each week.
+Additionally, I expect errors in the newsletter to drop because I don&rsquo;t have to write it while multitasking other stuff.
+Also, I find checking for errors in text I did not write myself much easier.</p><p>Nevertheless, there are several things I&rsquo;d like to improve for a version 2.0.
+First and foremost, I would integrate the chatbot into WhatsApp directly and let it send the mail itself after review.
+After I finished building the workflow, I found some promising community nodes that integrate with <a href=https://github.com/EvolutionAPI/evolution-api>Evolution API</a> or <a href=https://github.com/WhiskeySockets/Baileys>Baileys</a>, which would make WhatsApp communication possible.
+A separate mail account for the bot would solve the issues with connecting my Google account.
+Not needing to copy messages around would be a tremendous improvement to the bot&rsquo;s UX.</p><p>In terms of missing features, the completeness check mentioned above would be on top of the list, too.
+If it works, it would reliably reduce missing or unclear bits of information.</p><p>As described before, the bot&rsquo;s workflow is pretty rigid and only uses AI for generating text.
+If a newsletter needs to include a longer outlook or an additional calendar event from the coming week, I couldn&rsquo;t do it easily.
+This is a requirement that could be solved by using n8n&rsquo;s <em>Agent Node</em> where I could surface the calendar and messages as tools for an AI agent.
+This would give me much more flexibility, but make the behavior of the bot harder to reason about.
+If I go this route, it would definitely give me an excuse to try out n8n&rsquo;s <a href=https://docs.n8n.io/advanced-ai/evaluations/overview/>evaluation capabilities</a>.</p><p>Overall, I am really satisfied with this project and n8n.
+Could this automation workflow have been a Python script?
+Definitely!
+Was developing it with n8n much easier and more enjoyable?
+Absolutely!
+Executing nodes separately and out of order reminded me a lot of Jupyter Notebooks.
+It avoids needing to run the whole workflow for testing out localized changes.</p><p>This project had one more constraint I didn&rsquo;t mention up until now: being as digitally independent as possible.
+This means, no US hyperscalers for infrastructure and no US LLM providers.
+As a European, I wanted to check just how challenging things would get if we got cut off from these companies<sup id=fnref:5><a href=#fn:5 class=footnote-ref role=doc-noteref>5</a></sup>.
+In terms of digital independence, I count this project as a win, too.
+The platform, compute and AI are all of European origin.
+Sure, the boundaries, i.e., Telegram, WhatsApp and Google Calendar, are still problematic in this regard.
+But I could not rationalize migrating all of this for the sake of a personal experiment.
+Maybe, over time, I can convince my collaborators in the orchestra to go more independent.</p><p>In the meantime, I&rsquo;ll enjoy my newfound freetime while AI writes my newsletter.</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>I&rsquo;ve written this newsletter for almost ten years&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:2><p>within this post, AI refers to LLMs&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:3><p><a href=https://faircode.io>fair-code</a> is an interesting concept that may warrant a blog post of its own&#160;<a href=#fnref:3 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:4><p>although the environmental impact is concerning&#160;<a href=#fnref:4 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:5><p>obviously the problem runs deeper than software, but I know of no European hardware provider yet&#160;<a href=#fnref:5 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><footer class=post-footer><ul class=post-tags><li><a href=https://tilman151.github.io/tags/ai/>Ai</a></li><li><a href=https://tilman151.github.io/tags/llm/>Llm</a></li><li><a href=https://tilman151.github.io/tags/automation/>Automation</a></li></ul></footer></article></main><footer class=footer><span>&copy; 2026 <a href=https://tilman151.github.io/>Don't Repeat Yourself</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+<a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentColor"><path d="M12 6H0l6-6z"/></svg></a><style>#cookie-notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:90%;max-width:600px;padding:1rem;display:none;background:var(--entry);color:var(--primary);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:1000;text-align:center;align-items:center;justify-content:space-between;gap:1rem}#cookie-notice span{font-size:.9rem;line-height:1.4}.cookie-buttons{display:flex;gap:.5rem;flex-shrink:0}#cookie-notice a{padding:.4rem .8rem;border-radius:var(--radius);background:var(--tertiary);color:var(--primary);font-size:.85rem;cursor:pointer;text-decoration:none}#cookie-notice a:hover{background:var(--secondary);color:var(--theme)}@media(min-width:600px){#cookie-notice{display:none;flex-direction:row;text-align:left}}@media(max-width:599px){#cookie-notice{flex-direction:column;bottom:10px}}</style><div id=cookie-notice><span>I am using third-party cookies to count readers. If you're fine with this, click OK.</span><div class=cookie-buttons><a id=cookie-notice-accept>OK</a>
+<a href=/privacy>More info</a></div></div><script>(function(){const e="cookie-notice-dismissed";function t(e){const t=e+"=",n=document.cookie.split(";");for(let e=0;e<n.length;e++){const s=n[e].trim();if(s.indexOf(t)===0)return s.substring(t.length,s.length)}return null}if(t(e)==="true"){const e=document.createElement("script");e.async=!0,e.dataset.id="101271854",e.src="//static.getclicky.com/js",document.head.appendChild(e)}else{const t=document.getElementById("cookie-notice");t.style.display="flex",document.getElementById("cookie-notice-accept").addEventListener("click",function(){const n=new Date;n.setTime(n.getTime()+31*24*60*60*1e3),document.cookie=e+"=true; expires="+n.toUTCString()+"; path=/; SameSite=Lax",t.style.display="none",location.reload()})}})()</script><script>let menu=document.getElementById("menu");if(menu){const e=localStorage.getItem("menu-scroll-position");e&&(menu.scrollLeft=parseInt(e,10)),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}}document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{const e=document.querySelector("html");e.dataset.theme==="dark"?(e.dataset.theme="light",localStorage.setItem("pref-theme","light")):(e.dataset.theme="dark",localStorage.setItem("pref-theme","dark"))})</script></body></html>
