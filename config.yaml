@@ -4,6 +4,9 @@ title: Don't Repeat Yourself
 theme: "PaperMod"
 
 params:
+    title: Don't Repeat Yourself
+    description: PhD & Machine Learning Engineer with a passion for software engineering. On this personal blog I will write about machine learning and coding topics that keep me up at night.
+
     homeInfoParams:
         Title: Hi, I'm Tilman
         Content: PhD & Machine Learning Engineer with a passion for software engineering. On this personal blog I will write about machine learning and coding topics that keep me up at night.
