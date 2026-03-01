@@ -28,7 +28,7 @@ Each version is tested and should be usable in its current state if you want to 
 Therefore, we will use the <a href=https://github.com/t-davidson/hate-speech-and-offensive-language/>Automated Hate Speech Detection and the Problem of Offensive Language Dataset</a> or hate speech dataset for short.
 It consists of tweets that are either labeled hate speech, offensive, or neither.
 It is rather small, at about 2.5MB, and comes in a single CSV file.
-We can write a short and simple PyTorch dataset to load it and tag it as <a href=https://github.com/tilman151/composing-datasets/tree/v0.1.0><em>v0.1.0</em></a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> torch.utils.data <span style=color:#f92672>import</span> Dataset
+We can write a short and simple PyTorch dataset to load it and tag it as <a href=https://github.com/tilman151/composing-datasets/tree/v0.1.0><em>v0.1.0</em></a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> torch.utils.data <span style=color:#f92672>import</span> Dataset
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#75715e># [...]</span>
 </span></span><span style=display:flex><span>
@@ -69,7 +69,7 @@ Let&rsquo;s say, we want to try out another tokenizer, e.g. one from the revtok 
 Good for us that the <code>get_tokenizer</code> function from <code>torchtext</code> already provides a way to retrieve this tokenizer by passing <code>"revtok"</code>.
 We just add a string argument named <code>tokenizer</code> to the constructor and pass it to the function.
 Making this argument optional preserves the original feature of calling it without arguments to get the <code>basic_english</code> tokenizer.
-This is version <a href=https://github.com/tilman151/composing-datasets/tree/v0.2.0><code>0.2.0</code></a> of our dataset.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>HateSpeechDataset</span>(Dataset):
+This is version <a href=https://github.com/tilman151/composing-datasets/tree/v0.2.0><code>0.2.0</code></a> of our dataset.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>HateSpeechDataset</span>(Dataset):
 </span></span><span style=display:flex><span>    DOWNLOAD_URL: str <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;...&#34;</span>
 </span></span><span style=display:flex><span>    DATA_ROOT: str <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;...&#34;</span>
 </span></span><span style=display:flex><span>    DATA_FILE: str <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;...&#34;</span>
@@ -106,7 +106,7 @@ We get a user&rsquo;s movie review and have to predict the number of stars this 
 Each review comes as a plain text file with the star rating encoded in the file&rsquo;s name.</p><p>Basically, we want to do exactly the same data processing as with the hate speech dataset but have to load a different data format.
 Our <em>Intro to CS</em> knowledge tells us that this is a job for inheritance.
 Put the shared functionality in a base class and do the specialized data reading in a child class.
-This brings us to version <a href=https://github.com/tilman151/composing-datasets/tree/v0.3.0>0.3.0</a> of our code.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TextClassificationDataset</span>(Dataset, metaclass<span style=color:#f92672>=</span>ABCMeta):
+This brings us to version <a href=https://github.com/tilman151/composing-datasets/tree/v0.3.0>0.3.0</a> of our code.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TextClassificationDataset</span>(Dataset, metaclass<span style=color:#f92672>=</span>ABCMeta):
 </span></span><span style=display:flex><span>    DOWNLOAD_URL: str
 </span></span><span style=display:flex><span>    DATA_ROOT: str
 </span></span><span style=display:flex><span>    DATA_FILE: str
@@ -152,7 +152,7 @@ For the Imdb dataset, we have to provide a separate constructor, too, because it
 We have to pass the desired split as an argument so that <code>_load_data</code> knows which one to load.</p><p>With the automatic refactoring tools of modern IDEs, this is, again, not a big change but enables us to reuse our code for new data with ease.</p><h2 id=diverging-paths>Diverging Paths<a hidden class=anchor aria-hidden=true href=#diverging-paths>#</a></h2><p>We did some experiments on the Imdb data and came to the conclusion that we need more control over the tokenizer.
 For example, the <code>revtok</code> tokenizer has options that control the capitalization of tokens and if splits should be made on punctuation.
 We want to try these new configurations on the smaller hate speech dataset but then use it on the Imdb data with minimal effort.</p><p>An easy solution would be adding a dictionary argument to the dataset constructor which contains the keyword arguments to configure the tokenizer.
-The code below is version <a href=https://github.com/tilman151/composing-datasets/tree/v0.3.1-a>0.3.1-a</a> of our code and showcases this approach for the <code>revtok</code> tokenizer.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TextClassificationDataset</span>(Dataset, metaclass<span style=color:#f92672>=</span>ABCMeta):
+The code below is version <a href=https://github.com/tilman151/composing-datasets/tree/v0.3.1-a>0.3.1-a</a> of our code and showcases this approach for the <code>revtok</code> tokenizer.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TextClassificationDataset</span>(Dataset, metaclass<span style=color:#f92672>=</span>ABCMeta):
 </span></span><span style=display:flex><span>    DOWNLOAD_URL: str
 </span></span><span style=display:flex><span>    DATA_ROOT: str
 </span></span><span style=display:flex><span>    DATA_FILE: str
@@ -228,7 +228,7 @@ Each building block fulfills a specific functionality but capsules its inner wor
 In our case, we have two different types of building blocks: the ones that read the text and the labels from disk, and the tokenizer.
 Composing a dataset would be as easy as passing the constructor an object that reads the data of our choice and a tokenizer object.
 Both are configured outside the dataset object which gives us great flexibility.
-Version <a href=https://github.com/tilman151/composing-datasets/tree/v0.4.0>0.4.0</a> of our code adheres to these principles.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TextClassificationDataset</span>(Dataset):
+Version <a href=https://github.com/tilman151/composing-datasets/tree/v0.4.0>0.4.0</a> of our code adheres to these principles.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>TextClassificationDataset</span>(Dataset):
 </span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(
 </span></span><span style=display:flex><span>        self, dataset: Dataset, tokenizer: Union[str, Callable, <span style=color:#66d9ef>None</span>] <span style=color:#f92672>=</span> <span style=color:#66d9ef>None</span>
 </span></span><span style=display:flex><span>    ) <span style=color:#f92672>-&gt;</span> <span style=color:#66d9ef>None</span>:
@@ -289,12 +289,12 @@ Any object that implements this interface can be passed to our <code>TextClassif
 We can reuse the <code>_get_tokenizer</code> function from version 0.3.0 because of the versatile design of <code>get_tokenizer</code> from <code>torchtext</code>.
 It can receive a callable object and simply pass it through.
 This way, we can still use <code>tokenizer</code> as a simple string argument or pass a fully configured tokenizer object.
-To instantiate a hate speech dataset with a custom revtok tokenizer is as simple as:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>TextClassificationDataset(HateSpeechDataset(),
+To instantiate a hate speech dataset with a custom revtok tokenizer is as simple as:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>TextClassificationDataset(HateSpeechDataset(),
 </span></span><span style=display:flex><span>                          <span style=color:#66d9ef>lambda</span> x: revtok<span style=color:#f92672>.</span>tokenize(x, split_punctuation<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>))
 </span></span></code></pre></div><p>Adding new data this way is as easy as implementing the <code>torch</code> dataset interface.
 Most tokenizers can be used out of the box, as they follow the same interface of just being a callable.</p><h2 id=composing-even-further>Composing Even Further<a hidden class=anchor aria-hidden=true href=#composing-even-further>#</a></h2><p>We have seen how composing our dataset makes our code more flexible.
 Extending its functionality is simple, as well, by composing new datasets from <code>TextClassificationDataset</code>.
-Need a train-val split for the hate speech data?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> torch.utils.data <span style=color:#f92672>import</span> random_split
+Need a train-val split for the hate speech data?</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> torch.utils.data <span style=color:#f92672>import</span> random_split
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>hate_speech <span style=color:#f92672>=</span> TextClassificationDataset(HateSpeechDataset())
 </span></span><span style=display:flex><span>num_samples <span style=color:#f92672>=</span> len(hate_speech)
@@ -302,7 +302,7 @@ Need a train-val split for the hate speech data?</p><div class=highlight><pre ta
 </span></span></code></pre></div><p>The <code>random_split</code> function internally uses the <code>Subset</code> class which takes our base dataset and returns only a specified set of samples.
 But now the vocabulary still contains tokens that are only in the validation data.
 We may not want that.
-No problem at all for our composed dataset.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span>hate_speech <span style=color:#f92672>=</span> HateSpeechDataset()
+No problem at all for our composed dataset.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>hate_speech <span style=color:#f92672>=</span> HateSpeechDataset()
 </span></span><span style=display:flex><span>num_samples <span style=color:#f92672>=</span> len(hate_speech)
 </span></span><span style=display:flex><span>train, val <span style=color:#f92672>=</span> random_split(hate_speech, [num_samples <span style=color:#f92672>//</span> <span style=color:#ae81ff>2</span>] <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span>)
 </span></span><span style=display:flex><span>train <span style=color:#f92672>=</span> TextClassificationDataset(train)
@@ -311,7 +311,7 @@ No problem at all for our composed dataset.</p><div class=highlight><pre tabinde
 Now, let&rsquo;s imagine we want to use a pre-trained embedding layer.
 Do we need to change our dataset class?
 No, we don&rsquo;t.
-We simply compose a new dataset.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>PreTrainedEmbeddingDataset</span>(Dataset):
+We simply compose a new dataset.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>PreTrainedEmbeddingDataset</span>(Dataset):
 </span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>__init__</span>(self, dataset: Dataset, embeddings: torch<span style=color:#f92672>.</span>nn<span style=color:#f92672>.</span>Embedding) <span style=color:#f92672>-&gt;</span> <span style=color:#66d9ef>None</span>:
 </span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>dataset <span style=color:#f92672>=</span> dataset
 </span></span><span style=display:flex><span>        self<span style=color:#f92672>.</span>embeddings <span style=color:#f92672>=</span> embeddings
