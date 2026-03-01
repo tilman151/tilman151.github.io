@@ -4,7 +4,6 @@ slug: "why-this-blog-is-not-written-by-ai"
 date: 2026-03-01
 tags: [ai, llm]
 mathjax: false
-draft: true
 ---
 
 AI is everywhere right now, and you cannot escape it.
