@@ -6,8 +6,7 @@ tags: [ai, llm, deeplearning]
 mathjax: false
 cover:
   image: "/img/autoresearch_comparison_progress.png"
-  alt: "Progress plot comparing optuna's classic hyperparameter optimization algorithms with autoresearch running on Claude Code."
-  caption: "Progress plot comparing optuna's hyperparameter optimization with autoresearch running on Claude Code."
+  hidden: true
 ---
 
 The last few weeks, the [autoresearch](https://github.com/karpathy/autoresearch) repository by Andrew Karparthy has made some waves.
