@@ -43,3 +43,10 @@ markup:
   goldmark:
     extensions:
       footnote: true
+
+module:
+  mounts:
+    - source: assets
+      target: assets
+    - source: static
+      target: assets
