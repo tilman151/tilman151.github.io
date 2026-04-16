@@ -9,7 +9,7 @@ cover:
   hidden: true
 ---
 
-The last few weeks, the [autoresearch](https://github.com/karpathy/autoresearch) repository by Andrew Karparthy has made some waves.
+The last few weeks, the [autoresearch](https://github.com/karpathy/autoresearch) repository by Andrej Karparthy has made some waves.
 Everybody seemed to be hyped for LLMs doing deep learning research, while I had a look at the README and thought: "Well, that sounds like hyperparameter optimization with extra steps."
 Below you can see the progress plot Karparthy published as part of the repo.
 The LLM runs 83 experiments over eight hours and successfully reduces the validation metric by around 0.0282 bits per byte.
@@ -99,7 +99,7 @@ At more than $27 in API costs, I was really thankful for the weak Dollar to Euro
 
 So at the low cost of about $27, you can get LLM-flavored hyperparameter optimization that is worse than what we already have.
 Autoresearch, therefore, remains an interesting but flawed proposition.
-LLMs can be insanely useful, but only for problems for which better solutions are available.
+LLMs can be insanely useful, but only for problems for which no better solutions are available.
 
 The coding agent didn't even try to change something fundamental about the training, although it had permission to do so.
 I think this reveals a fundamental issue: why do we assume an LLM has more insight into training deep neural networks than a human researcher?
